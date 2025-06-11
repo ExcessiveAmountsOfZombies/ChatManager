@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.epherical.chatmanager.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "refmap": "chatmanager.refmap.json",
+  "mixins": [
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
