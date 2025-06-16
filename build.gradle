@@ -10,6 +10,10 @@ group = mod_group_id
 
 repositories {
     mavenLocal()
+    mavenCentral()
+    maven {
+        url = 'https://repo.lucko.me/'
+    }
 }
 
 base {
@@ -113,6 +117,9 @@ dependencies {
     // Example project dependency using a sister or child project:
     // implementation project(":myproject")
 
+    // LuckPerms API for placeholders and permissions
+    implementation 'net.luckperms:api:5.4'
+
     // For more info:
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
@@ -164,4 +171,26 @@ idea {
         downloadSources = true
         downloadJavadoc = true
     }
+}
+
+// Define your target directories
+def targetDir1 = file("D:\\FeedTheMachineGod\\Servers\\Server1\\mods")
+def targetDir2 = file("D:\\FeedTheMachineGod\\Servers\\Server2\\mods")
+
+def jar = tasks.named("jar").flatMap { it.archiveFile }
+
+tasks.register("copyToDir1", Copy) {
+    dependsOn jar
+    from(jar)
+    into(targetDir1)
+}
+
+tasks.register("copyToDir2", Copy) {
+    dependsOn jar
+    from(jar)
+    into(targetDir2)
+}
+
+tasks.register("copyFinalJar") {
+    dependsOn "copyToDir1", "copyToDir2", publishToMavenLocal
 }
