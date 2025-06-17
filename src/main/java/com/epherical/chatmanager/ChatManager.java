@@ -19,6 +19,7 @@ import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -33,6 +34,9 @@ public class ChatManager {
     public static final String MODID = "chatmanager";
     private static final Logger LOGGER = LogUtils.getLogger();
 
+
+    public static ChatManager mod;
+
     // Chat components
     private ChannelManager channelManager;
 
@@ -41,6 +45,7 @@ public class ChatManager {
     public static final ResourceLocation PLAYER_PLACEHOLDER = ResourceLocation.fromNamespaceAndPath(MODID, "player");
 
     public ChatManager(IEventBus modEventBus, ModContainer modContainer) {
+        mod = this;
         modEventBus.addListener(this::commonSetup);
         NeoForge.EVENT_BUS.register(this);
         modContainer.registerConfig(ModConfig.Type.COMMON, ChatConfig.SPEC, "chatmanager");
@@ -65,37 +70,8 @@ public class ChatManager {
         new DynamicChannelCommand(channelManager).register(event.getDispatcher());
     }
 
-    // You can use SubscribeEvent and let the Event Bus discover methods to call
-    @SubscribeEvent
-    public void onServerStarting(ServerStartingEvent event) {
-        LuckPerms luckPermsApi = LuckPermsProvider.get();
-        LuckPermsPlaceholders luckPermsPlaceholders = new LuckPermsPlaceholders(luckPermsApi);
-        PlaceholderManager.register(DISPLAY_PLACEHOLDER, player -> ChatConfig.displayNameFormat);
-        PlaceholderManager.register(PLAYER_PLACEHOLDER, player -> player.getName().getString());
-        LOGGER.info("LuckPerms placeholders initialized");
-    }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
-    public void playersChatting(ServerChatEvent event) {
-        ServerPlayer player = event.getPlayer();
-
-        Channel channel = channelManager.getChannel(player);
-
-        channel.parseMessage(player, player.getUUID(), event.getUsername(), event.getRawText());
-        event.setCanceled(true);
-    }
-
-
-    @SubscribeEvent
-    public void onServerChat(MessagedParsedEvent event) {
-        MinecraftServer server = event.getPlayer().getServer();
-
-        server.getPlayerList().broadcastSystemMessage(event.getMessage(), player -> {
-            MessageSendEvent post = NeoForge.EVENT_BUS.post(new MessageSendEvent(event.getPlayer(), player, event.getMessage()));
-            if (post.isCanceled()) {
-                return null; // Other listeners will handle if the event should send the message to the player or not.
-            }
-            return event.getMessage();
-        }, false);
+    public ChannelManager getChannelManager() {
+        return channelManager;
     }
 }
