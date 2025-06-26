@@ -1,12 +1,11 @@
 package com.epherical.chatmanager.client.events;
 
-import com.epherical.chatmanager.mixin.ChatScreenAccessorMixin;
 import com.epherical.chatmanager.client.widgets.ChannelButtonWidget;
+import com.epherical.chatmanager.mixin.ChatScreenAccessorMixin;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.ChatScreen;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.Component;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
@@ -25,7 +24,6 @@ public class ScreenListener {
     private void rebuildBar(Minecraft mc) {
         barButtons.clear();
         moreButton = null;
-        ChatType.CHAT
 
         int minButtonWidth = 30;
         int paddingX = 10;
@@ -95,75 +93,75 @@ public class ScreenListener {
         if (event.getScreen() instanceof ChatScreen) {
             Minecraft mc = Minecraft.getInstance();
             GuiGraphics guiGraphics = event.getGuiGraphics();
-            double mouseX = mc.mouseHandler.xpos() * mc.getWindow().getGuiScaledWidth() / (double)mc.getWindow().getScreenWidth();
-            double mouseY = mc.mouseHandler.ypos() * mc.getWindow().getGuiScaledHeight() / (double)mc.getWindow().getScreenHeight();
+            double mouseX = mc.mouseHandler.xpos() * mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getScreenWidth();
+            double mouseY = mc.mouseHandler.ypos() * mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getScreenHeight();
 
-        // Render bar (0–2) and hamburger (3)
-        int barEnd = Math.min(4, barButtons.size());
-        for (int i = 0; i < barEnd; i++) {
-            ChannelButtonWidget button = barButtons.get(i);
-            button.setHovered(button.isMouseOver(mouseX, mouseY));
-            button.render(guiGraphics, (int)mouseX, (int)mouseY, 0f);
-        }
-        // Dropdown (4+)
-        if (showDropdown && barButtons.size() > 4) {
-            int x = barButtons.get(4).getX();
-            int y = barButtons.get(4).getY();
-            int width = barButtons.get(4).getWidth();
-            int height = (barButtons.size() - 4) * (barButtons.get(4).getHeight() + 1);
-            guiGraphics.fill(x - 2, y - 2, x + width + 2, y + height + 2, 0xCC222222);
-            for (int i = 4; i < barButtons.size(); i++) {
-                ChannelButtonWidget drop = barButtons.get(i);
-                drop.setHovered(drop.isMouseOver(mouseX, mouseY));
-                drop.render(guiGraphics, (int)mouseX, (int)mouseY, 0f);
+            // Render bar (0–2) and hamburger (3)
+            int barEnd = Math.min(4, barButtons.size());
+            for (int i = 0; i < barEnd; i++) {
+                ChannelButtonWidget button = barButtons.get(i);
+                button.setHovered(button.isMouseOver(mouseX, mouseY));
+                button.render(guiGraphics, (int) mouseX, (int) mouseY, 0f);
+            }
+            // Dropdown (4+)
+            if (showDropdown && barButtons.size() > 4) {
+                int x = barButtons.get(4).getX();
+                int y = barButtons.get(4).getY();
+                int width = barButtons.get(4).getWidth();
+                int height = (barButtons.size() - 4) * (barButtons.get(4).getHeight() + 1);
+                guiGraphics.fill(x - 2, y - 2, x + width + 2, y + height + 2, 0xCC222222);
+                for (int i = 4; i < barButtons.size(); i++) {
+                    ChannelButtonWidget drop = barButtons.get(i);
+                    drop.setHovered(drop.isMouseOver(mouseX, mouseY));
+                    drop.render(guiGraphics, (int) mouseX, (int) mouseY, 0f);
+                }
             }
         }
     }
-}
 
-@SubscribeEvent
-public void onMouseClicked(ScreenEvent.MouseButtonPressed.Pre event) {
-    if (event.getScreen() instanceof ChatScreen) {
-        double mouseX = event.getMouseX();
-        double mouseY = event.getMouseY();
-        int button = event.getButton();
+    @SubscribeEvent
+    public void onMouseClicked(ScreenEvent.MouseButtonPressed.Pre event) {
+        if (event.getScreen() instanceof ChatScreen) {
+            double mouseX = event.getMouseX();
+            double mouseY = event.getMouseY();
+            int button = event.getButton();
 
-        // Dropdown (4+)
-        if (showDropdown && barButtons.size() > 4) {
-            boolean insideDropdown = false;
-            for (int i = 4; i < barButtons.size(); i++) {
+            // Dropdown (4+)
+            if (showDropdown && barButtons.size() > 4) {
+                boolean insideDropdown = false;
+                for (int i = 4; i < barButtons.size(); i++) {
+                    ChannelButtonWidget widget = barButtons.get(i);
+                    if (widget.mouseClicked(mouseX, mouseY, button)) {
+                        event.setCanceled(true);
+                        return;
+                    }
+                    if (widget.isMouseOver(mouseX, mouseY)) insideDropdown = true;
+                }
+                // Hamburger closes
+                if (barButtons.size() > 3 && barButtons.get(3).isMouseOver(mouseX, mouseY) && button == 0) {
+                    barButtons.get(3).onClick(mouseX, mouseY);
+                    event.setCanceled(true);
+                    return;
+                }
+                // Click outside closes
+                if (!insideDropdown && (!barButtons.get(3).isMouseOver(mouseX, mouseY))) {
+                    showDropdown = false;
+                    event.setCanceled(true);
+                }
+                return;
+            }
+
+            // Normal bar
+            int barEnd = Math.min(4, barButtons.size());
+            for (int i = 0; i < barEnd; i++) {
                 ChannelButtonWidget widget = barButtons.get(i);
                 if (widget.mouseClicked(mouseX, mouseY, button)) {
                     event.setCanceled(true);
                     return;
                 }
-                if (widget.isMouseOver(mouseX, mouseY)) insideDropdown = true;
-            }
-            // Hamburger closes
-            if (barButtons.size() > 3 && barButtons.get(3).isMouseOver(mouseX, mouseY) && button == 0) {
-                barButtons.get(3).onClick(mouseX, mouseY);
-                event.setCanceled(true);
-                return;
-            }
-            // Click outside closes
-            if (!insideDropdown && (!barButtons.get(3).isMouseOver(mouseX, mouseY))) {
-                showDropdown = false;
-                event.setCanceled(true);
-            }
-            return;
-        }
-
-        // Normal bar
-        int barEnd = Math.min(4, barButtons.size());
-        for (int i = 0; i < barEnd; i++) {
-            ChannelButtonWidget widget = barButtons.get(i);
-            if (widget.mouseClicked(mouseX, mouseY, button)) {
-                event.setCanceled(true);
-                return;
             }
         }
     }
-}
 
     @SubscribeEvent
     public void onScreenInit(ScreenEvent.Init.Post event) {

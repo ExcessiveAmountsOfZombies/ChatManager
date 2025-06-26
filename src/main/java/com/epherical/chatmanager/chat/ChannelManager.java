@@ -5,6 +5,9 @@ import com.epherical.chatmanager.config.ChatConfig;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 
+import java.util.Collection;
+import java.util.List;
+
 public class ChannelManager {
     private static final String CHANNEL_PREF_KEY = "redisglobalchat.channel.current";
     private static final String MUTE_PREFIX = "redisglobalchat.channel.mute.";
@@ -26,6 +29,10 @@ public class ChannelManager {
 
     public Channel getChannelByName(String channelName) {
         return ChatConfig.parsedChannels.get(channelName.toLowerCase());
+    }
+
+    public Collection<Channel> getAllChannels() {
+        return ChatConfig.parsedChannels.values();
     }
 
 

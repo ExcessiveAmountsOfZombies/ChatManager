@@ -9,6 +9,9 @@ import com.epherical.chatmanager.placeholders.PlaceholderManager;
 import com.mojang.logging.LogUtils;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
+import net.minecraft.network.chat.ChatType;
+import net.minecraft.network.chat.OutgoingChatMessage;
+import net.minecraft.network.chat.PlayerChatMessage;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.api.distmarker.Dist;
@@ -24,25 +27,26 @@ import org.slf4j.Logger;
 import static com.epherical.chatmanager.ChatManager.DISPLAY_PLACEHOLDER;
 import static com.epherical.chatmanager.ChatManager.PLAYER_PLACEHOLDER;
 
-@EventBusSubscriber(modid = ChatManager.MODID, bus = EventBusSubscriber.Bus.MOD, value = {Dist.DEDICATED_SERVER})
+@EventBusSubscriber(modid = ChatManager.MODID, bus = EventBusSubscriber.Bus.GAME/*, value = {Dist.DEDICATED_SERVER}*/)
 public class ServerEvents {
 
     private static final Logger LOGGER = LogUtils.getLogger();
 
     // You can use SubscribeEvent and let the Event Bus discover methods to call
     @SubscribeEvent
-    public void onServerStarting(ServerStartingEvent event) {
+    public static void onServerStarting(ServerStartingEvent event) {
+        PlaceholderManager.register(DISPLAY_PLACEHOLDER, player -> ChatConfig.displayNameFormat);
+        PlaceholderManager.register(PLAYER_PLACEHOLDER, player -> player.getName().getString());
         if (ModList.get().isLoaded("luckperms")) {
             LuckPerms luckPermsApi = LuckPermsProvider.get();
             LuckPermsPlaceholders luckPermsPlaceholders = new LuckPermsPlaceholders(luckPermsApi);
-            PlaceholderManager.register(DISPLAY_PLACEHOLDER, player -> ChatConfig.displayNameFormat);
-            PlaceholderManager.register(PLAYER_PLACEHOLDER, player -> player.getName().getString());
+
             LOGGER.info("LuckPerms placeholders initialized");
         }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
-    public void playersChatting(ServerChatEvent event) {
+    public static void playersChatting(ServerChatEvent event) {
         ServerPlayer player = event.getPlayer();
 
         Channel channel = ChatManager.mod.getChannelManager().getChannel(player);
@@ -53,15 +57,19 @@ public class ServerEvents {
 
 
     @SubscribeEvent
-    public void onServerChat(MessagedParsedEvent event) {
+    public static void onServerChat(MessagedParsedEvent event) {
         MinecraftServer server = event.getPlayer().getServer();
 
-        server.getPlayerList().broadcastSystemMessage(event.getMessage(), player -> {
+        PlayerChatMessage unsigned = PlayerChatMessage.unsigned(event.getUuid(), "");
+
+        PlayerChatMessage playerChatMessage = unsigned.withUnsignedContent(event.getMessage());
+
+        for (ServerPlayer player : server.getPlayerList().getPlayers()) {
             MessageSendEvent post = NeoForge.EVENT_BUS.post(new MessageSendEvent(event.getPlayer(), player, event.getMessage()));
-            if (post.isCanceled()) {
-                return null; // Other listeners will handle if the event should send the message to the player or not.
+            if (!post.isCanceled()) {
+                event.getChannel();
+                player.sendChatMessage(OutgoingChatMessage.create(playerChatMessage), false, ChatType.bind(event.getChannel().getChatTypeKey(), player));
             }
-            return event.getMessage();
-        }, false);
+        }
     }
 }

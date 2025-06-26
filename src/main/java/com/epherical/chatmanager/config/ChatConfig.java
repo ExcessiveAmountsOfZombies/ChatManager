@@ -20,7 +20,7 @@ public class ChatConfig {
     // --- Display name formatting ---
     public static final ModConfigSpec.ConfigValue<String> DISPLAY_NAME_FORMAT =
             BUILDER.comment("Format for player display names. Supports placeholders such as {player}, {luckperms:prefix}, etc.")
-                    .define("display.format", "<comp color='#d4af37'>[{luckperms:prefix}]</comp> <comp color='#43ff43'>{player}</comp>");
+                    .define("display.format", "<comp color='#d4af37'>[{luckperms:prefix}]</comp> <comp color='#43ff43'>{chatmanager:player}</comp>");
 
     // --- Chat channels ---
     public static final List<ChannelConfig> CHANNELS = new ArrayList<>();
@@ -41,7 +41,7 @@ public class ChatConfig {
                 List.of("general"),
                 "redisglobalchat.channel.general",
                 "LOCAL",
-                "<comp color='#bfedb2'></comp> {display} &7: <comp color='#ffffff'>{message}</comp>"
+                "<comp color='#bfedb2'></comp> {chatmanager:display} &7: <comp color='#ffffff'>{message}</comp>"
         ));
 
         for (ChannelConfigInternal internal : CHANNEL_CONFIGS) {
