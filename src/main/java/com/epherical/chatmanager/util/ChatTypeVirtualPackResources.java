@@ -109,7 +109,7 @@ public class ChatTypeVirtualPackResources implements PackResources {
         dataResources.clear();
 
         for (Channel ch : ChatConfig.parsedChannels.values()) {
-            String id = ch.name().toLowerCase();
+            String id = ch.name().toLowerCase().replaceAll(" ", "_");
             ResourceLocation fileLoc = ResourceLocation.fromNamespaceAndPath(
                     NAMESPACE, "chat_type/" + id + ".json"
             );

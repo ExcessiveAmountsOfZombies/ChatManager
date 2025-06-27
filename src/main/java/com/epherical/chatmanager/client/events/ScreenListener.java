@@ -1,19 +1,26 @@
 package com.epherical.chatmanager.client.events;
 
+import com.epherical.chatmanager.ChatManager;
 import com.epherical.chatmanager.client.widgets.ChannelButtonWidget;
 import com.epherical.chatmanager.mixin.ChatScreenAccessorMixin;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.ChatScreen;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ScreenListener {
+
+    private static Component currentChannel = null; // Keeps track of the current channel
 
     private final List<Component> allChannels = new ArrayList<>();
     private final List<ChannelButtonWidget> barButtons = new ArrayList<>();
@@ -44,7 +51,15 @@ public class ScreenListener {
                 Component c = allChannels.remove(channelIndex);
                 allChannels.add(0, c);
                 showDropdown = false;
+                currentChannel = c; // Set current channel when clicked
                 rebuildBar(mc);
+
+                // Send join command for channel when button is clicked
+                String channelName = c.getString();
+                String commandChannelName = channelName.replace(" ", "_"); // Must match your command convention
+                if (mc.player != null && mc.player.connection != null) {
+                    mc.player.connection.sendCommand("join " + commandChannelName);
+                }
             };
             barButtons.add(widget);
             currentX += width + buttonSpacing;
@@ -80,7 +95,15 @@ public class ScreenListener {
                     Component c = allChannels.remove(channelIndex);
                     allChannels.add(0, c);
                     showDropdown = false;
+                    currentChannel = c;
                     rebuildBar(mc);
+
+                    // Send join command for channel when button is clicked (dropdown)
+                    String channelName = c.getString();
+                    String commandChannelName = channelName.replace(" ", "_");
+                    if (mc.player != null && mc.player.connection != null) {
+                        mc.player.connection.sendCommand("join " + commandChannelName);
+                    }
                 };
                 barButtons.add(widget);
                 dropdownY += buttonHeight + 1;
@@ -172,12 +195,34 @@ public class ScreenListener {
 
             // Example channel initialization
             allChannels.clear();
-            allChannels.add(Component.literal("Global"));
-            allChannels.add(Component.literal("Team"));
-            allChannels.add(Component.literal("Staff"));
-            allChannels.add(Component.literal("Builder"));
-            allChannels.add(Component.literal("Market"));
-            allChannels.add(Component.literal("RP")); // Additional as needed
+            RegistryAccess registryAccess = mc.level != null ? mc.level.registryAccess() : null;
+            if (registryAccess != null) {
+                registryAccess.registryOrThrow(Registries.CHAT_TYPE).keySet().stream()
+                        .filter(key -> key.getNamespace().equals(ChatManager.MODID)) // Only "chatmanager" chat types
+                        .forEach(key -> {
+                            String rawName = key.getPath();
+                            // Format: replace underscores with space, capitalize each word
+                            String formatted = Arrays.stream(rawName.split("_"))
+                                    .map(word -> word.isEmpty() ? word : word.substring(0, 1).toUpperCase() + word.substring(1))
+                                    .collect(Collectors.joining(" "));
+                            allChannels.add(Component.literal(formatted));
+                        });
+            }
+
+            // Move the currentChannel to the front if it exists in the list
+            if (currentChannel != null) {
+                int idx = -1;
+                for (int i = 0; i < allChannels.size(); i++) {
+                    if (allChannels.get(i).getString().equals(currentChannel.getString())) {
+                        idx = i;
+                        break;
+                    }
+                }
+                if (idx > 0) {
+                    Component temp = allChannels.remove(idx);
+                    allChannels.add(0, temp);
+                }
+            }
 
             rebuildBar(mc);
         }
