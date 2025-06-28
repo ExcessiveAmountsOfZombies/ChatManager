@@ -1,5 +1,6 @@
 package com.epherical.chatmanager.client.widgets;
 
+import com.epherical.chatmanager.client.events.ScreenListener;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -12,8 +13,8 @@ import net.minecraft.sounds.SoundSource;
 public class ChannelButtonWidget extends AbstractWidget {
     public Runnable onClick = null;
 
-    public ChannelButtonWidget(int x, int y, int width, int height, Component message) {
-        super(x, y, width, height, message);
+    public ChannelButtonWidget(int x, int y, int width, int height, ScreenListener.ChannelEntry message) {
+        super(x, y, width, height, message.component());
     }
 
     @Override

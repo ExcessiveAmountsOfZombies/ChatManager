@@ -2,14 +2,16 @@ package com.epherical.chatmanager.client.events;
 
 import com.epherical.chatmanager.ChatManager;
 import com.epherical.chatmanager.client.widgets.ChannelButtonWidget;
-import com.epherical.chatmanager.mixin.ChatScreenAccessorMixin;
+import com.epherical.chatmanager.mixin.client.ChatScreenAccessorMixin;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 
@@ -20,9 +22,12 @@ import java.util.stream.Collectors;
 
 public class ScreenListener {
 
-    private static Component currentChannel = null; // Keeps track of the current channel
+    private static final Component ALL_CHANNEL = Component.literal("All");
 
-    private final List<Component> allChannels = new ArrayList<>();
+
+    private static ChannelEntry currentChannel = null; // Keeps track of the current channel
+
+    private final List<ChannelEntry> allChannels = new ArrayList<>();
     private final List<ChannelButtonWidget> barButtons = new ArrayList<>();
     private ChannelButtonWidget moreButton = null;
     private boolean showDropdown = false;
@@ -42,20 +47,21 @@ public class ScreenListener {
         int count = Math.min(3, allChannels.size());
         int currentX = xStart;
         for (int i = 0; i < count; i++) {
-            Component name = allChannels.get(i);
-            int textWidth = mc.font.width(name);
+            ChannelEntry name = allChannels.get(i);
+            int textWidth = mc.font.width(name.component);
             int width = Math.max(minButtonWidth, textWidth + paddingX * 2);
             ChannelButtonWidget widget = new ChannelButtonWidget(currentX, yAboveInput, width, buttonHeight, name);
             final int channelIndex = i;
             widget.onClick = () -> {
-                Component c = allChannels.remove(channelIndex);
+                ChannelEntry c = allChannels.remove(channelIndex);
                 allChannels.add(0, c);
                 showDropdown = false;
                 currentChannel = c; // Set current channel when clicked
+                ChatListener.manager.setCurrentChannel(c.key);
                 rebuildBar(mc);
 
                 // Send join command for channel when button is clicked
-                String channelName = c.getString();
+                String channelName = c.component.getString();
                 String commandChannelName = channelName.replace(" ", "_"); // Must match your command convention
                 if (mc.player != null && mc.player.connection != null) {
                     mc.player.connection.sendCommand("join " + commandChannelName);
@@ -69,7 +75,7 @@ public class ScreenListener {
         if (allChannels.size() > 3) {
             int w = Math.max(minButtonWidth, mc.font.width(Component.literal("...")) + paddingX * 2);
             int right = mc.getWindow().getGuiScaledWidth() - w - 10;
-            moreButton = new ChannelButtonWidget(right, yAboveInput, w, buttonHeight, Component.literal("..."));
+            moreButton = new ChannelButtonWidget(right, yAboveInput, w, buttonHeight, new ChannelEntry(Component.literal("..."), null));
             moreButton.onClick = () -> showDropdown = !showDropdown;
             barButtons.add(moreButton);
 
@@ -79,7 +85,7 @@ public class ScreenListener {
             // 1. Find widest dropdown channel
             int maxDropdownWidth = minButtonWidth;
             for (int i = 3; i < allChannels.size(); i++) {
-                int textWidth = mc.font.width(allChannels.get(i));
+                int textWidth = mc.font.width(allChannels.get(i).component);
                 int width = textWidth + paddingX * 2;
                 if (width > maxDropdownWidth) maxDropdownWidth = width;
             }
@@ -88,18 +94,19 @@ public class ScreenListener {
             if (dropdownX < 0) dropdownX = 0;
             int dropdownY = moreButton.getY() - (buttonHeight + 1) * menuCount;
             for (int i = 3; i < allChannels.size(); i++) {
-                Component name = allChannels.get(i);
+                ChannelEntry name = allChannels.get(i);
                 ChannelButtonWidget widget = new ChannelButtonWidget(dropdownX, dropdownY, maxDropdownWidth, buttonHeight, name);
                 final int channelIndex = i;
                 widget.onClick = () -> {
-                    Component c = allChannels.remove(channelIndex);
+                    ChannelEntry c = allChannels.remove(channelIndex);
                     allChannels.add(0, c);
                     showDropdown = false;
                     currentChannel = c;
+                    ChatListener.manager.setCurrentChannel(c.key);
                     rebuildBar(mc);
 
                     // Send join command for channel when button is clicked (dropdown)
-                    String channelName = c.getString();
+                    String channelName = c.component.getString();
                     String commandChannelName = channelName.replace(" ", "_");
                     if (mc.player != null && mc.player.connection != null) {
                         mc.player.connection.sendCommand("join " + commandChannelName);
@@ -113,8 +120,9 @@ public class ScreenListener {
 
     @SubscribeEvent
     public void onScreenRender(ScreenEvent.Render.Post event) {
-        if (event.getScreen() instanceof ChatScreen) {
+        if (event.getScreen() instanceof ChatScreen screen) {
             Minecraft mc = Minecraft.getInstance();
+
             GuiGraphics guiGraphics = event.getGuiGraphics();
             double mouseX = mc.mouseHandler.xpos() * mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getScreenWidth();
             double mouseY = mc.mouseHandler.ypos() * mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getScreenHeight();
@@ -195,6 +203,10 @@ public class ScreenListener {
 
             // Example channel initialization
             allChannels.clear();
+
+            allChannels.add(new ChannelEntry(ALL_CHANNEL, null));
+
+
             RegistryAccess registryAccess = mc.level != null ? mc.level.registryAccess() : null;
             if (registryAccess != null) {
                 registryAccess.registryOrThrow(Registries.CHAT_TYPE).keySet().stream()
@@ -205,7 +217,7 @@ public class ScreenListener {
                             String formatted = Arrays.stream(rawName.split("_"))
                                     .map(word -> word.isEmpty() ? word : word.substring(0, 1).toUpperCase() + word.substring(1))
                                     .collect(Collectors.joining(" "));
-                            allChannels.add(Component.literal(formatted));
+                            allChannels.add(new ChannelEntry(Component.literal(formatted), ResourceKey.create(Registries.CHAT_TYPE, key)));
                         });
             }
 
@@ -213,13 +225,13 @@ public class ScreenListener {
             if (currentChannel != null) {
                 int idx = -1;
                 for (int i = 0; i < allChannels.size(); i++) {
-                    if (allChannels.get(i).getString().equals(currentChannel.getString())) {
+                    if (allChannels.get(i).component.getString().equals(currentChannel.component.getString())) {
                         idx = i;
                         break;
                     }
                 }
                 if (idx > 0) {
-                    Component temp = allChannels.remove(idx);
+                    ChannelEntry temp = allChannels.remove(idx);
                     allChannels.add(0, temp);
                 }
             }
@@ -227,4 +239,8 @@ public class ScreenListener {
             rebuildBar(mc);
         }
     }
+
+    public record ChannelEntry(Component component, ResourceKey<ChatType> key) {}
+
+
 }

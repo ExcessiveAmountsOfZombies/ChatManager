@@ -1,4 +1,4 @@
-package com.epherical.chatmanager.mixin;
+package com.epherical.chatmanager.mixin.client;
 
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.ChatScreen;
