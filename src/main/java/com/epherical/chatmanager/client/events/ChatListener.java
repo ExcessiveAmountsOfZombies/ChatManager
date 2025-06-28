@@ -2,6 +2,10 @@ package com.epherical.chatmanager.client.events;
 
 import com.epherical.chatmanager.ChatManager;
 import com.epherical.chatmanager.client.ClientChannelManager;
+import com.epherical.chatmanager.mixin.client.GuiAccessorMixin;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.ChatType;
 import net.minecraft.resources.ResourceKey;
@@ -18,7 +22,7 @@ public class ChatListener {
 
     @SubscribeEvent
     public void onClientReceivePlayerChat(ClientChatReceivedEvent.Player event) {
-
+        // handle in mixin
     }
 
 

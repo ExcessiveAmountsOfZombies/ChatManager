@@ -7,7 +7,9 @@
   "mixins": [
   ],
   "client": [
+    "client.ChatComponentMixin",
     "client.ChatScreenAccessorMixin",
+    "client.GuiAccessorMixin",
     "client.GuiMixin"
   ],
   "injectors": {

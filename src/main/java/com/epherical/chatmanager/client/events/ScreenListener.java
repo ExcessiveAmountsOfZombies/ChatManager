@@ -29,6 +29,8 @@ public class ScreenListener {
 
     private final List<ChannelEntry> allChannels = new ArrayList<>();
     private final List<ChannelButtonWidget> barButtons = new ArrayList<>();
+
+    private ChannelButtonWidget allChannelButton = null;
     private ChannelButtonWidget moreButton = null;
     private boolean showDropdown = false;
     private int yAboveInput = 0;
@@ -36,6 +38,7 @@ public class ScreenListener {
     private void rebuildBar(Minecraft mc) {
         barButtons.clear();
         moreButton = null;
+        allChannelButton = null;
 
         int minButtonWidth = 30;
         int paddingX = 10;
@@ -46,10 +49,23 @@ public class ScreenListener {
         // BAR BUTTONS (0–2)
         int count = Math.min(3, allChannels.size());
         int currentX = xStart;
+
+        int textWidth = mc.font.width(ALL_CHANNEL);
+        int width = Math.max(minButtonWidth, textWidth + paddingX * 2);
+        this.allChannelButton = new ChannelButtonWidget(currentX, yAboveInput, width, buttonHeight,
+                new ChannelEntry(ALL_CHANNEL, null));
+        allChannelButton.onClick = () -> {
+            currentChannel = null;
+            ChatListener.manager.setCurrentChannel(null);
+        };
+        currentX += width + buttonSpacing;
+
+
+
         for (int i = 0; i < count; i++) {
             ChannelEntry name = allChannels.get(i);
-            int textWidth = mc.font.width(name.component);
-            int width = Math.max(minButtonWidth, textWidth + paddingX * 2);
+            textWidth = mc.font.width(name.component);
+            width = Math.max(minButtonWidth, textWidth + paddingX * 2);
             ChannelButtonWidget widget = new ChannelButtonWidget(currentX, yAboveInput, width, buttonHeight, name);
             final int channelIndex = i;
             widget.onClick = () -> {
@@ -85,8 +101,8 @@ public class ScreenListener {
             // 1. Find widest dropdown channel
             int maxDropdownWidth = minButtonWidth;
             for (int i = 3; i < allChannels.size(); i++) {
-                int textWidth = mc.font.width(allChannels.get(i).component);
-                int width = textWidth + paddingX * 2;
+                textWidth = mc.font.width(allChannels.get(i).component);
+                width = textWidth + paddingX * 2;
                 if (width > maxDropdownWidth) maxDropdownWidth = width;
             }
 
@@ -126,6 +142,9 @@ public class ScreenListener {
             GuiGraphics guiGraphics = event.getGuiGraphics();
             double mouseX = mc.mouseHandler.xpos() * mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getScreenWidth();
             double mouseY = mc.mouseHandler.ypos() * mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getScreenHeight();
+
+            allChannelButton.render(guiGraphics, (int) mouseX, (int) mouseY, 0f);
+            allChannelButton.setHovered(allChannelButton.isMouseOver(mouseX, mouseY));
 
             // Render bar (0–2) and hamburger (3)
             int barEnd = Math.min(4, barButtons.size());
@@ -182,6 +201,11 @@ public class ScreenListener {
                 return;
             }
 
+            if (allChannelButton.mouseClicked(mouseX, mouseY, button)) {
+                event.setCanceled(true);
+                return;
+            }
+
             // Normal bar
             int barEnd = Math.min(4, barButtons.size());
             for (int i = 0; i < barEnd; i++) {
@@ -203,8 +227,6 @@ public class ScreenListener {
 
             // Example channel initialization
             allChannels.clear();
-
-            allChannels.add(new ChannelEntry(ALL_CHANNEL, null));
 
 
             RegistryAccess registryAccess = mc.level != null ? mc.level.registryAccess() : null;

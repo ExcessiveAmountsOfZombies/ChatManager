@@ -2,6 +2,7 @@ package com.epherical.chatmanager.mixin.client;
 
 import com.epherical.chatmanager.client.ClientChannelManager;
 import com.epherical.chatmanager.client.events.ChatListener;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.network.chat.ChatType;
