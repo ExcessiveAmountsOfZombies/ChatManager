@@ -1,5 +1,6 @@
 package com.epherical.chatmanager.mixin.client;
 
+import com.epherical.chatmanager.client.events.ChatListener;
 import net.minecraft.client.GuiMessageTag;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.ChatComponent;
@@ -15,14 +16,6 @@ import javax.annotation.Nullable;
 @Mixin(ChatComponent.class)
 public class ChatComponentMixin {
 
-    // Intercept the simplest addMessage(Component)
-    @Inject(
-            method = "addMessage(Lnet/minecraft/network/chat/Component;)V",
-            at = @At("HEAD")
-    )
-    private void onAddMessage(Component chatComponent, CallbackInfo ci) {
-        forwardToBase(chatComponent, null, null);
-    }
 
     // Intercept the addMessage(Component, MessageSignature, GuiMessageTag)
     @Inject(
@@ -38,13 +31,8 @@ public class ChatComponentMixin {
         if (minecraft != null && minecraft.gui != null) {
             // Don't reforward if we're already on the vanilla chat component—that would double-print!
             ChatComponent thisComponent = (ChatComponent) (Object) this;
-            ChatComponent baseComponent = ((GuiAccessorMixin) minecraft.gui).getGuiChatComponent();
-            if (thisComponent != baseComponent) {
-                if (signature == null && tag == null) {
-                    baseComponent.addMessage(chatComponent);
-                } else {
-                    baseComponent.addMessage(chatComponent, signature, tag);
-                }
+            if (!thisComponent.equals(ChatListener.chatComponent)) {
+                ChatListener.chatComponent.addMessage(chatComponent, signature, tag);
             }
         }
     }

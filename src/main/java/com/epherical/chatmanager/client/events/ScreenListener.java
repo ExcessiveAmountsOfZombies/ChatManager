@@ -5,6 +5,7 @@ import com.epherical.chatmanager.client.widgets.ChannelButtonWidget;
 import com.epherical.chatmanager.mixin.client.ChatScreenAccessorMixin;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.core.RegistryAccess;
@@ -13,6 +14,7 @@ import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.client.event.CustomizeGuiOverlayEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 
 import java.util.ArrayList;
@@ -59,7 +61,6 @@ public class ScreenListener {
             ChatListener.manager.setCurrentChannel(null);
         };
         currentX += width + buttonSpacing;
-
 
 
         for (int i = 0; i < count; i++) {
@@ -262,7 +263,8 @@ public class ScreenListener {
         }
     }
 
-    public record ChannelEntry(Component component, ResourceKey<ChatType> key) {}
+    public record ChannelEntry(Component component, ResourceKey<ChatType> key) {
+    }
 
 
 }
