@@ -1,11 +1,9 @@
 package com.epherical.chatmanager;
 
 import com.epherical.chatmanager.chat.Channel;
-import com.epherical.chatmanager.config.ChatConfig;
 import com.epherical.chatmanager.event.MessageSendEvent;
 import com.epherical.chatmanager.event.MessagedParsedEvent;
 import com.epherical.chatmanager.placeholders.LuckPermsPlaceholders;
-import com.epherical.chatmanager.placeholders.PlaceholderManager;
 import com.mojang.logging.LogUtils;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
@@ -24,19 +22,15 @@ import net.neoforged.neoforge.event.ServerChatEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import org.slf4j.Logger;
 
-import static com.epherical.chatmanager.ChatManager.DISPLAY_PLACEHOLDER;
-import static com.epherical.chatmanager.ChatManager.PLAYER_PLACEHOLDER;
-
-@EventBusSubscriber(modid = ChatManager.MODID, bus = EventBusSubscriber.Bus.GAME/*, value = {Dist.DEDICATED_SERVER}*/)
+@EventBusSubscriber(modid = ChatManager.MODID, bus = EventBusSubscriber.Bus.GAME, value = {Dist.DEDICATED_SERVER})
 public class ServerEvents {
+
 
     private static final Logger LOGGER = LogUtils.getLogger();
 
     // You can use SubscribeEvent and let the Event Bus discover methods to call
     @SubscribeEvent
     public static void onServerStarting(ServerStartingEvent event) {
-        PlaceholderManager.register(DISPLAY_PLACEHOLDER, player -> ChatConfig.displayNameFormat);
-        PlaceholderManager.register(PLAYER_PLACEHOLDER, player -> player.getName().getString());
         if (ModList.get().isLoaded("luckperms")) {
             LuckPerms luckPermsApi = LuckPermsProvider.get();
             LuckPermsPlaceholders luckPermsPlaceholders = new LuckPermsPlaceholders(luckPermsApi);

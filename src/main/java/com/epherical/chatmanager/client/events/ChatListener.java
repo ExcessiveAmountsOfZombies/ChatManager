@@ -4,7 +4,6 @@ import com.epherical.chatmanager.ChatManager;
 import com.epherical.chatmanager.client.ClientChannelManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.ChatComponent;
-import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.ChatType;
 import net.minecraft.resources.ResourceKey;

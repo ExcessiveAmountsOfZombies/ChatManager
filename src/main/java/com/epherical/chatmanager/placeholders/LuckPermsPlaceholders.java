@@ -1,5 +1,6 @@
 package com.epherical.chatmanager.placeholders;
 
+import com.epherical.chatmanager.util.PlaceHolderContext;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.cacheddata.CachedMetaData;
@@ -16,27 +17,27 @@ public final class LuckPermsPlaceholders {
     }
 
     private void registerDefaults() {
-        PlaceholderManager.register(
+        PlaceHolderManager.register(
                 ResourceLocation.fromNamespaceAndPath("luckperms", "prefix"),
                 this::getPrefix
         );
-        PlaceholderManager.register(
+        PlaceHolderManager.register(
                 ResourceLocation.fromNamespaceAndPath("luckperms", "suffix"),
                 this::getSuffix
         );
     }
 
-    private String getPrefix(ServerPlayer player) {
+    private String getPrefix(PlaceHolderContext player) {
         if (player == null) return "";
-        User user = luckPerms.getUserManager().getUser(player.getUUID());
+        User user = luckPerms.getUserManager().getUser(player.getPlayer().getUUID());
         if (user == null) return "";
         CachedMetaData meta = user.getCachedData().getMetaData();
         return meta.getPrefix() == null ? "" : meta.getPrefix();
     }
 
-    private String getSuffix(ServerPlayer player) {
+    private String getSuffix(PlaceHolderContext player) {
         if (player == null) return "";
-        User user = luckPerms.getUserManager().getUser(player.getUUID());
+        User user = luckPerms.getUserManager().getUser(player.getPlayer().getUUID());
         if (user == null) return "";
         CachedMetaData meta = user.getCachedData().getMetaData();
         return meta.getSuffix() == null ? "" : meta.getSuffix();

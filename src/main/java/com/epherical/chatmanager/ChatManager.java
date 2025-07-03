@@ -3,6 +3,8 @@ package com.epherical.chatmanager;
 import com.epherical.chatmanager.chat.ChannelManager;
 import com.epherical.chatmanager.commands.chat.DynamicChannelCommand;
 import com.epherical.chatmanager.config.ChatConfig;
+import com.epherical.chatmanager.permissions.ChannelPermissions;
+import com.epherical.chatmanager.placeholders.PlaceHolderManager;
 import com.epherical.chatmanager.util.ChatTypeVirtualPackResources;
 import com.mojang.logging.LogUtils;
 import net.minecraft.network.chat.Component;
@@ -42,6 +44,21 @@ public class ChatManager {
 
     public static final ResourceLocation DISPLAY_PLACEHOLDER = ResourceLocation.fromNamespaceAndPath(MODID, "display");
     public static final ResourceLocation PLAYER_PLACEHOLDER = ResourceLocation.fromNamespaceAndPath(MODID, "player");
+    public static final ResourceLocation MSPT_PLACEHOLDER = ResourceLocation.fromNamespaceAndPath(MODID, "mspt");
+    public static final ResourceLocation LEVEL_PLACEHOLDER = ResourceLocation.fromNamespaceAndPath(MODID, "level");
+    public static final ResourceLocation MOTD_PLACEHOLDER = ResourceLocation.fromNamespaceAndPath(MODID, "motd");
+    public static final ResourceLocation PLAYER_COUNT = ResourceLocation.fromNamespaceAndPath(MODID, "player_count");
+    public static final ResourceLocation PLAYER_PING = ResourceLocation.fromNamespaceAndPath(MODID, "player_ping");
+    public static final ResourceLocation PLAYER_X = ResourceLocation.fromNamespaceAndPath(MODID, "player_x");
+    public static final ResourceLocation PLAYER_Y = ResourceLocation.fromNamespaceAndPath(MODID, "player_y");
+    public static final ResourceLocation PLAYER_Z = ResourceLocation.fromNamespaceAndPath(MODID, "player_z");
+    public static final ResourceLocation PLAYER_XYZ = ResourceLocation.fromNamespaceAndPath(MODID, "player_xyz");
+    public static final ResourceLocation PLAYER_MAX_HEALTH = ResourceLocation.fromNamespaceAndPath(MODID, "player_max_health");
+    public static final ResourceLocation PLAYER_HEALTH = ResourceLocation.fromNamespaceAndPath(MODID, "player_health");
+    public static final ResourceLocation PLAYER_HUNGER = ResourceLocation.fromNamespaceAndPath(MODID, "player_hunger");
+    public static final ResourceLocation WORLD_TIME = ResourceLocation.fromNamespaceAndPath(MODID, "world_time");
+    public static final ResourceLocation WORLD_DAY = ResourceLocation.fromNamespaceAndPath(MODID, "world_day");
+
 
     public ChatManager(IEventBus modEventBus, ModContainer modContainer) {
         mod = this;
@@ -49,7 +66,99 @@ public class ChatManager {
         modEventBus.addListener(this::onAddPackFinders);
         NeoForge.EVENT_BUS.register(ServerEvents.class);
         NeoForge.EVENT_BUS.register(this);
+        NeoForge.EVENT_BUS.register(new ChannelPermissions());
         modContainer.registerConfig(ModConfig.Type.COMMON, ChatConfig.SPEC, "chatmanager");
+
+
+        PlaceHolderManager.register(DISPLAY_PLACEHOLDER, player -> ChatConfig.displayNameFormat);
+        PlaceHolderManager.register(PLAYER_PLACEHOLDER, player -> player.getPlayer().getName().getString());
+        PlaceHolderManager.register(MSPT_PLACEHOLDER, ctx -> {
+            if (ctx.getServer() != null) {
+                double tps = ctx.getServer().tickRateManager().millisecondsPerTick();
+                // If you have an array of TPS values, take the average or a specific value (e.g., last 1 minute)
+                // double tps = ctx.getServer().recentTps()[0];
+                return String.format("%.2f", tps);
+            }
+            return "?";
+        });
+        PlaceHolderManager.register(LEVEL_PLACEHOLDER, ctx -> {
+            if (ctx.getLevel() != null) {
+                return ctx.getLevel().dimension().location().getPath();
+            }
+            if (ctx.getPlayer() != null) {
+                return ctx.getPlayer().level().dimension().location().getPath();
+            }
+            return "unknown";
+        });
+        PlaceHolderManager.register(MOTD_PLACEHOLDER, ctx -> {
+            if (ctx.getServer() != null) {
+                return ctx.getServer().getMotd();
+            }
+            return "Minecraft Server";
+        });
+        PlaceHolderManager.register(PLAYER_COUNT, ctx -> {
+            if (ctx.getServer() != null && ctx.getServer().getPlayerList() != null) {
+                return String.valueOf(ctx.getServer().getPlayerList().getPlayerCount());
+            }
+            return "?";
+        });
+
+        PlaceHolderManager.register(PLAYER_PING, ctx -> {
+            if (ctx.getPlayer() != null) {
+                return String.valueOf(ctx.getPlayer().connection.latency());
+            }
+            return "?";
+        });
+
+        PlaceHolderManager.register(PLAYER_X, ctx -> {
+            if (ctx.getPlayer() != null) {
+                return String.format("%.2f", ctx.getPlayer().getX());
+            }
+            return "?";
+        });
+
+        PlaceHolderManager.register(PLAYER_Y, ctx -> {
+            if (ctx.getPlayer() != null) {
+                return String.format("%.2f", ctx.getPlayer().getY());
+            }
+            return "?";
+        });
+
+        PlaceHolderManager.register(PLAYER_Z, ctx -> {
+            if (ctx.getPlayer() != null) {
+                return String.format("%.2f", ctx.getPlayer().getZ());
+            }
+            return "?";
+        });
+
+        PlaceHolderManager.register(PLAYER_XYZ, ctx -> {
+            if (ctx.getPlayer() != null) {
+                return String.format("%.2f, %.2f, %.2f", ctx.getPlayer().getX(), ctx.getPlayer().getY(), ctx.getPlayer().getZ());
+            }
+            return "?";
+        });
+
+        /*PlaceHolderManager.register(PLAYER_MAX_HEALTH, ctx -> {
+            if (ctx.getPlayer() != null) {
+                return String.format("%.0f", ctx.getPlayer().getMaxHealth());
+            }
+            return "?";
+        });
+
+        PlaceHolderManager.register(PLAYER_HEALTH, ctx -> {
+            if (ctx.getPlayer() != null) {
+                return String.format("%.0f", ctx.getPlayer().getHealth());
+            }
+            return "?";
+        });*/
+
+        PlaceHolderManager.register(PLAYER_HUNGER, ctx -> {
+            if (ctx.getPlayer() != null) {
+                return String.valueOf(ctx.getPlayer().getFoodData().getFoodLevel());
+            }
+            return "?";
+        });
+
     }
 
 

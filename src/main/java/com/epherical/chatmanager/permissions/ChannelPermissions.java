@@ -29,7 +29,7 @@ public class ChannelPermissions {
                 PermissionNode<Boolean> node = new PermissionNode<Boolean>(
                         ResourceLocation.fromNamespaceAndPath(ChatManager.MODID, perm),
                         PermissionTypes.BOOLEAN,
-                        (player, stack, ctx) -> false // default: no access
+                        (player, stack, ctx) -> true // default: no access
                 );
                 CHANNEL_PERMISSION_NODES.put(channel.name().toLowerCase(), node);
                 event.addNodes(node);

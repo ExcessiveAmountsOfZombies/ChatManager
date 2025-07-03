@@ -1,6 +1,6 @@
 package com.epherical.chatmanager.util;
 
-import com.epherical.chatmanager.placeholders.PlaceholderManager;
+import com.epherical.chatmanager.placeholders.PlaceHolderManager;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -28,7 +28,7 @@ public final class ChatMessenger {
 
     public static MutableComponent parse(ServerPlayer player, String rawText) {
         // 1. placeholder expansion
-        String expanded = PlaceholderManager.process(rawText, player);
+        String expanded = PlaceHolderManager.process(rawText, PlaceHolderContext.create(player.getServer(), player.serverLevel(), player));
 
         // 2. parse into a proper Minecraft component
         return ComponentParser.parse(expanded);

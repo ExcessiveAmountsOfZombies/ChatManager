@@ -6,7 +6,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.Collection;
-import java.util.List;
 
 public class ChannelManager {
     private static final String CHANNEL_PREF_KEY = "redisglobalchat.channel.current";

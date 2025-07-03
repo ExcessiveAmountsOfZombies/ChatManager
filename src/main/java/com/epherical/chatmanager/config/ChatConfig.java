@@ -19,30 +19,43 @@ public class ChatConfig {
 
     // --- Display name formatting ---
     public static final ModConfigSpec.ConfigValue<String> DISPLAY_NAME_FORMAT =
-            BUILDER.comment("Format for player display names. Supports placeholders such as {player}, {luckperms:prefix}, etc.")
-                    .define("display.format", "<comp color='#d4af37'>[{luckperms:prefix}]</comp> <comp color='#43ff43'>{chatmanager:player}</comp>");
+            BUILDER.comment("Format for player display names. Supports placeholders such as {chatmanager:player}, {luckperms:prefix}, etc.")
+                    .define("display.format", "<comp color='#d4af37'>[</comp><comp color='#ffffff'>{chatmanager:player}</comp><comp color='#d4af37'>]</comp>");
 
     // --- Chat channels ---
     public static final List<ChannelConfig> CHANNELS = new ArrayList<>();
     private static final List<ChannelConfigInternal> CHANNEL_CONFIGS = new ArrayList<>();
 
     static {
-        // Example default channel
-        CHANNEL_CONFIGS.add(new ChannelConfigInternal(
-                "Global",
-                List.of("g", "global"),
-                "redisglobalchat.channel.global",
-                "GLOBAL",
-                "<comp color='#b2cefc'>[G|{redisglobalchat:server}]</comp> {display} &7: <comp color='#ff00ff'>{message}</comp>"
-        ));
-
         CHANNEL_CONFIGS.add(new ChannelConfigInternal(
                 "General",
                 List.of("general"),
-                "redisglobalchat.channel.general",
+                "chatmanager.channel.general",
                 "LOCAL",
-                "<comp color='#bfedb2'></comp> {chatmanager:display} &7: <comp color='#ffffff'>{message}</comp>"
+                "{chatmanager:display}: <comp color='#808080'>{message}</comp>"
         ));
+        CHANNEL_CONFIGS.add(new ChannelConfigInternal(
+                "Markets",
+                List.of("markets", "market"),
+                "chatmanager.channel.markets",
+                "LOCAL",
+                "{chatmanager:display}: <comp color='#1abc9c'>{message}</comp>"
+        ));
+        CHANNEL_CONFIGS.add(new ChannelConfigInternal(
+                "Offtopic",
+                List.of("offtopic", "off"),
+                "chatmanager.channel.offtopic",
+                "LOCAL",
+                "{chatmanager:display}: <comp color='#b490ff'>{message}</comp>"
+        ));
+        CHANNEL_CONFIGS.add(new ChannelConfigInternal(
+                "Help",
+                List.of("help"),
+                "chatmanager.channel.help",
+                "LOCAL",
+                "{chatmanager:display}: <comp color='#ffbc40'>{message}</comp>"
+        ));
+
 
         for (ChannelConfigInternal internal : CHANNEL_CONFIGS) {
             String path = "channels." + internal.name;
