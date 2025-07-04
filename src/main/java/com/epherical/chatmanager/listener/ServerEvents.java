@@ -24,6 +24,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.ServerChatEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.server.permission.PermissionAPI;
 import net.neoforged.neoforge.server.permission.nodes.PermissionNode;
@@ -37,12 +38,12 @@ public class ServerEvents {
 
     // You can use SubscribeEvent and let the Event Bus discover methods to call
     @SubscribeEvent
-    public static void onServerStarting(ServerStartingEvent event) {
+    public static void onServerStarting(ServerStartedEvent event) {
         if (ModList.get().isLoaded("luckperms")) {
             LuckPerms luckPermsApi = LuckPermsProvider.get();
             LuckPermsPlaceholders luckPermsPlaceholders = new LuckPermsPlaceholders(luckPermsApi);
 
-            LOGGER.info("LuckPerms placeholders initialized");
+            LOGGER.info("[ChatManager] LuckPerms placeholders initialized");
         }
     }
 
