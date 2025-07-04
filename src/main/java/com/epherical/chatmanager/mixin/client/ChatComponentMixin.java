@@ -1,6 +1,7 @@
 package com.epherical.chatmanager.mixin.client;
 
 import com.epherical.chatmanager.client.events.ChatListener;
+import com.epherical.chatmanager.compat.ChatHeadsReflector;
 import net.minecraft.client.GuiMessageTag;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.ChatComponent;
@@ -13,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import javax.annotation.Nullable;
 
-@Mixin(ChatComponent.class)
+@Mixin(value = ChatComponent.class, priority = 980)
 public class ChatComponentMixin {
 
 
@@ -28,6 +29,7 @@ public class ChatComponentMixin {
 
     private void forwardToBase(Component chatComponent, @Nullable MessageSignature signature, @Nullable GuiMessageTag tag) {
         Minecraft minecraft = Minecraft.getInstance();
+        Object lastSenderData = ChatHeadsReflector.getLastSenderData();
         if (minecraft != null && minecraft.gui != null) {
             // Don't reforward if we're already on the vanilla chat component—that would double-print!
             ChatComponent thisComponent = (ChatComponent) (Object) this;
@@ -35,5 +37,7 @@ public class ChatComponentMixin {
                 ChatListener.chatComponent.addMessage(chatComponent, signature, tag);
             }
         }
+        ChatHeadsReflector.setLastSenderData(lastSenderData);
+
     }
 }

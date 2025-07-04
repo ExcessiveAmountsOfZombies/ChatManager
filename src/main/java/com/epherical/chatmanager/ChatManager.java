@@ -3,6 +3,8 @@ package com.epherical.chatmanager;
 import com.epherical.chatmanager.chat.ChannelManager;
 import com.epherical.chatmanager.commands.chat.DynamicChannelCommand;
 import com.epherical.chatmanager.config.ChatConfig;
+import com.epherical.chatmanager.listener.NameFormatListener;
+import com.epherical.chatmanager.listener.ServerEvents;
 import com.epherical.chatmanager.permissions.ChannelPermissions;
 import com.epherical.chatmanager.placeholders.PlaceHolderManager;
 import com.epherical.chatmanager.util.ChatTypeVirtualPackResources;
@@ -67,11 +69,12 @@ public class ChatManager {
         NeoForge.EVENT_BUS.register(ServerEvents.class);
         NeoForge.EVENT_BUS.register(this);
         NeoForge.EVENT_BUS.register(new ChannelPermissions());
+        NeoForge.EVENT_BUS.register(NameFormatListener.class);
         modContainer.registerConfig(ModConfig.Type.COMMON, ChatConfig.SPEC, "chatmanager");
 
 
         PlaceHolderManager.register(DISPLAY_PLACEHOLDER, player -> ChatConfig.displayNameFormat);
-        PlaceHolderManager.register(PLAYER_PLACEHOLDER, player -> player.getPlayer().getName().getString());
+        PlaceHolderManager.register(PLAYER_PLACEHOLDER, player -> player.getPlayer().getDisplayName().getString());
         PlaceHolderManager.register(MSPT_PLACEHOLDER, ctx -> {
             if (ctx.getServer() != null) {
                 double tps = ctx.getServer().tickRateManager().millisecondsPerTick();
@@ -137,6 +140,7 @@ public class ChatManager {
             }
             return "?";
         });
+
 
         /*PlaceHolderManager.register(PLAYER_MAX_HEALTH, ctx -> {
             if (ctx.getPlayer() != null) {

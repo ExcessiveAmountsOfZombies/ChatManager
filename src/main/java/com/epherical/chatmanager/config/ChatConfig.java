@@ -19,8 +19,8 @@ public class ChatConfig {
 
     // --- Display name formatting ---
     public static final ModConfigSpec.ConfigValue<String> DISPLAY_NAME_FORMAT =
-            BUILDER.comment("Format for player display names. Supports placeholders such as {chatmanager:player}, {luckperms:prefix}, etc.")
-                    .define("display.format", "<comp color='#d4af37'>[</comp><comp color='#ffffff'>{chatmanager:player}</comp><comp color='#d4af37'>]</comp>");
+            BUILDER.comment("Format for player display names. Supports placeholders such as {player}, {luckperms:prefix}, etc.")
+                    .define("display.format", "<comp color='#d4af37'>[</comp><comp color='#ffffff'>{player}</comp><comp color='#d4af37'>]</comp>");
 
     // --- Chat channels ---
     public static final List<ChannelConfig> CHANNELS = new ArrayList<>();

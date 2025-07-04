@@ -2,8 +2,10 @@ package com.epherical.chatmanager.client.events;
 
 import com.epherical.chatmanager.ChatManager;
 import com.epherical.chatmanager.client.ClientChannelManager;
+import com.epherical.chatmanager.compat.ChatHeadsReflector;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.ChatComponent;
+import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.ChatType;
 import net.minecraft.resources.ResourceKey;
@@ -25,10 +27,14 @@ public class ChatListener {
         // handle in mixin
         Minecraft mc = Minecraft.getInstance();
         ChatComponent chat = mc.gui.getChat();
+        PlayerInfo playerInfo = mc.getConnection().getPlayerInfo(event.getSender());
         if (chatComponent.equals(chat)) {
             ChatComponent chatComponent1 = manager.getChatComponent(event.getBoundChatType().chatType().getKey());
+            ChatHeadsReflector.handleAddedMessage(event.getMessage(), event.getBoundChatType(), playerInfo);
             chatComponent1.addMessage(event.getMessage(), null, null);
             event.setCanceled(true);
+        } else {
+            ChatHeadsReflector.handleAddedMessage(event.getMessage(), event.getBoundChatType(), playerInfo);
         }
     }
 

@@ -1,5 +1,6 @@
-package com.epherical.chatmanager;
+package com.epherical.chatmanager.listener;
 
+import com.epherical.chatmanager.ChatManager;
 import com.epherical.chatmanager.chat.Channel;
 import com.epherical.chatmanager.config.ChatConfig;
 import com.epherical.chatmanager.event.MessageSendEvent;

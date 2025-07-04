@@ -14,10 +14,20 @@ repositories {
     maven {
         url = 'https://repo.lucko.me/'
     }
+    exclusiveContent {
+        forRepository {
+            maven {
+                url "https://cursemaven.com"
+            }
+        }
+        filter {
+            includeGroup "curse.maven"
+        }
+    }
 }
 
 base {
-    archivesName = mod_id
+    archivesName = mod_id + "-NEOFORGE"
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
@@ -119,6 +129,12 @@ dependencies {
 
     // LuckPerms API for placeholders and permissions
     implementation 'net.luckperms:api:5.4'
+    //implementation "curse.maven:chat-heads-407206:6483040"
+
+    // rly bro
+    //implementation "curse.maven:ftb-essentials-410811:6179042"
+    //implementation "curse.maven:architectury-api-419699:5786327"
+    //implementation "curse.maven:ftb-library-forge-404465:6711324"
 
     // For more info:
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
