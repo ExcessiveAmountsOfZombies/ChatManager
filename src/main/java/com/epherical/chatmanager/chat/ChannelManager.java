@@ -8,8 +8,8 @@ import net.minecraft.server.level.ServerPlayer;
 import java.util.Collection;
 
 public class ChannelManager {
-    private static final String CHANNEL_PREF_KEY = "redisglobalchat.channel.current";
-    private static final String MUTE_PREFIX = "redisglobalchat.channel.mute.";
+    private static final String CHANNEL_PREF_KEY = "chatmanager.channel.current";
+    private static final String MUTE_PREFIX = "chatmanager.channel.mute.";
 
     /**
      * Join (switch to) a channel. Store their channel preference for future logins.

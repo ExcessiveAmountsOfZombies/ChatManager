@@ -9,6 +9,7 @@ import com.epherical.chatmanager.permissions.ChannelPermissions;
 import com.epherical.chatmanager.placeholders.PlaceHolderManager;
 import com.epherical.chatmanager.util.ChatTypeVirtualPackResources;
 import com.mojang.logging.LogUtils;
+import net.luckperms.api.event.LuckPermsEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackLocationInfo;
@@ -71,7 +72,6 @@ public class ChatManager {
         NeoForge.EVENT_BUS.register(new ChannelPermissions());
         NeoForge.EVENT_BUS.register(NameFormatListener.class);
         modContainer.registerConfig(ModConfig.Type.COMMON, ChatConfig.SPEC, "chatmanager");
-
 
         PlaceHolderManager.register(DISPLAY_PLACEHOLDER, player -> ChatConfig.displayNameFormat);
         PlaceHolderManager.register(PLAYER_PLACEHOLDER, player -> player.getPlayer().getDisplayName().getString());

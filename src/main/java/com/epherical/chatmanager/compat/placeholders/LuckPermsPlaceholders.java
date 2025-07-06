@@ -1,11 +1,11 @@
-package com.epherical.chatmanager.placeholders;
+package com.epherical.chatmanager.compat.placeholders;
 
+import com.epherical.chatmanager.placeholders.PlaceHolderManager;
 import com.epherical.chatmanager.util.PlaceHolderContext;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.cacheddata.CachedMetaData;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
 
 public final class LuckPermsPlaceholders {
 

@@ -128,14 +128,15 @@ dependencies {
     // implementation project(":myproject")
 
     // LuckPerms API for placeholders and permissions
-    implementation "curse.maven:luckperms-431733:5654231"
+    //implementation "curse.maven:luckperms-431733:5654231"
     implementation 'net.luckperms:api:5.4'
     //implementation "curse.maven:chat-heads-407206:6483040"
 
     // rly bro
     //implementation "curse.maven:ftb-essentials-410811:6179042"
-    //implementation "curse.maven:architectury-api-419699:5786327"
-    //implementation "curse.maven:ftb-library-forge-404465:6711324"
+    compileOnly "curse.maven:architectury-api-419699:5786327"
+    compileOnly "curse.maven:ftb-library-forge-404465:6711324"
+    compileOnly "curse.maven:ftb-ranks-forge-314905:6431744"
 
     // For more info:
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html

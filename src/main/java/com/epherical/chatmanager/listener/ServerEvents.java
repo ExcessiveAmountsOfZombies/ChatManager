@@ -2,11 +2,12 @@ package com.epherical.chatmanager.listener;
 
 import com.epherical.chatmanager.ChatManager;
 import com.epherical.chatmanager.chat.Channel;
+import com.epherical.chatmanager.compat.placeholders.FTBRanksPlaceholders;
 import com.epherical.chatmanager.config.ChatConfig;
 import com.epherical.chatmanager.event.MessageSendEvent;
 import com.epherical.chatmanager.event.MessagedParsedEvent;
 import com.epherical.chatmanager.permissions.ChannelPermissions;
-import com.epherical.chatmanager.placeholders.LuckPermsPlaceholders;
+import com.epherical.chatmanager.compat.placeholders.LuckPermsPlaceholders;
 import com.epherical.chatmanager.util.ChatMessenger;
 import com.mojang.logging.LogUtils;
 import net.luckperms.api.LuckPerms;
@@ -25,7 +26,6 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.ServerChatEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
-import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.server.permission.PermissionAPI;
 import net.neoforged.neoforge.server.permission.nodes.PermissionNode;
 import org.slf4j.Logger;
@@ -40,10 +40,19 @@ public class ServerEvents {
     @SubscribeEvent
     public static void onServerStarting(ServerStartedEvent event) {
         if (ModList.get().isLoaded("luckperms")) {
-            LuckPerms luckPermsApi = LuckPermsProvider.get();
-            LuckPermsPlaceholders luckPermsPlaceholders = new LuckPermsPlaceholders(luckPermsApi);
+            try {
+                LuckPerms luckPermsApi = LuckPermsProvider.get();
+                LuckPermsPlaceholders luckPermsPlaceholders = new LuckPermsPlaceholders(luckPermsApi);
+            } catch (Exception e) {
+                LOGGER.warn("Are you loading LuckPerms? in Single Player? That is not a supported environment.", e);
+                LOGGER.warn(e.getMessage());
+            }
 
             LOGGER.info("[ChatManager] LuckPerms placeholders initialized");
+        }
+        if (ModList.get().isLoaded("ftbranks")) {
+            FTBRanksPlaceholders ftbranksPlaceholders = new FTBRanksPlaceholders();
+            LOGGER.info("[ChatManager] FTBRanks placeholders initialized");
         }
     }
 

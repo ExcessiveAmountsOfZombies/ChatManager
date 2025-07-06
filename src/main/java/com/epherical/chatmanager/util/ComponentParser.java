@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
  *       ComponentParser.parse("""
  *            <comp color="#434343" style="bold,italic" font="minecraft:font2">
  *                Howdy
- *                <comp color="#000000">Bitch</comp>
+ *                <comp color="#000000">Dumbass</comp>
  *            </comp>
  *       """);
  */
