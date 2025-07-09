@@ -30,11 +30,26 @@ public class ChatListener {
         PlayerInfo playerInfo = mc.getConnection().getPlayerInfo(event.getSender());
         if (chatComponent.equals(chat)) {
             ChatComponent chatComponent1 = manager.getChatComponent(event.getBoundChatType().chatType().getKey());
+
             ChatHeadsReflector.handleAddedMessage(event.getMessage(), event.getBoundChatType(), playerInfo);
             chatComponent1.addMessage(event.getMessage(), null, null);
+
             event.setCanceled(true);
         } else {
+            ChatComponent chatComponent1 = manager.getChatComponent(event.getBoundChatType().chatType().getKey());
+            chatComponent1.addMessage(event.getMessage(), null, null);
+
+            if (manager != null) {
+                manager.incrementUnread(event.getBoundChatType().chatType().getKey());
+            }
+
+
             ChatHeadsReflector.handleAddedMessage(event.getMessage(), event.getBoundChatType(), playerInfo);
+
+            if (!chatComponent.equals(chat)) {
+                // we don't want the current chat message to be sent, but we will ADD it to the chatCOmponent above
+                event.setCanceled(true);
+            }
         }
     }
 

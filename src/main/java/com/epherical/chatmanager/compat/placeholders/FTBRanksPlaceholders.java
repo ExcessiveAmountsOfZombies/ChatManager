@@ -1,8 +1,6 @@
 package com.epherical.chatmanager.compat.placeholders;
 
 import com.epherical.chatmanager.placeholders.PlaceHolderManager;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import dev.ftb.mods.ftbranks.FTBRanks;
 import dev.ftb.mods.ftbranks.api.FTBRanksAPI;
 import dev.ftb.mods.ftbranks.api.Rank;
 import net.minecraft.resources.ResourceLocation;
