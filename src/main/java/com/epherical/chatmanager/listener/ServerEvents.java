@@ -4,6 +4,7 @@ import com.epherical.chatmanager.ChatManager;
 import com.epherical.chatmanager.chat.Channel;
 import com.epherical.chatmanager.compat.placeholders.FTBRanksPlaceholders;
 import com.epherical.chatmanager.config.ChatConfig;
+import com.epherical.chatmanager.event.BoundChatTypeEvent;
 import com.epherical.chatmanager.event.MessageSendEvent;
 import com.epherical.chatmanager.event.MessagedParsedEvent;
 import com.epherical.chatmanager.permissions.ChannelPermissions;
@@ -92,16 +93,17 @@ public class ServerEvents {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     public static void playersChatting(ServerChatEvent event) {
+
+
         ServerPlayer player = event.getPlayer();
 
         Channel channel = ChatManager.mod.getChannelManager().getChannel(player);
-
-        channel.parseMessage(player, player.getUUID(), event.getUsername(), event.getRawText());
-        event.setCanceled(true);
+        event.setMessage(channel.parseMessage(player, player.getUUID(), event.getUsername(), event.getRawText()));
+        //event.setCanceled(true);
     }
 
 
-    @SubscribeEvent
+    /*@SubscribeEvent
     public static void onServerChat(MessagedParsedEvent event) {
         MinecraftServer server = event.getPlayer().getServer();
 
@@ -112,9 +114,16 @@ public class ServerEvents {
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
             MessageSendEvent post = NeoForge.EVENT_BUS.post(new MessageSendEvent(event.getPlayer(), player, event.getMessage()));
             if (!post.isCanceled()) {
-                event.getChannel();
+
                 player.sendChatMessage(OutgoingChatMessage.create(playerChatMessage), false, ChatType.bind(event.getChannel().getChatTypeKey(), player));
             }
         }
+    }*/
+
+    @SubscribeEvent
+    public static void onBoundChatType(BoundChatTypeEvent e) {
+        Channel channel = ChatManager.mod.getChannelManager().getChannel(e.getSender());
+        e.setBoundChatType(ChatType.bind(channel.getChatTypeKey(), e.getSender()));
     }
+
 }

@@ -1,4 +1,4 @@
-package com.epherical.chatmanager.placeholders;
+package com.epherical.chatmanager.placeholders.register;
 
 import net.minecraft.resources.ResourceLocation;
 

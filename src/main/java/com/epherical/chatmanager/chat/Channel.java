@@ -37,10 +37,10 @@ public class Channel {
     }
 
 
-    public void parseMessage(ServerPlayer player, UUID uuid, String username, String message) {
-        MutableComponent parse = ChatMessenger.parse(player, format.replaceAll("\\{message}", message));
-        // todo; see if the actual message content gets parsed...
-        MessagedParsedEvent post = NeoForge.EVENT_BUS.post(new MessagedParsedEvent(player, uuid, username, message, this, parse));
+    public MutableComponent parseMessage(ServerPlayer player, UUID uuid, String username, String message) {
+        return ChatMessenger.parse(player, format.replaceAll("\\{message}", message));
+        /*// todo; see if the actual message content gets parsed...
+        MessagedParsedEvent post = NeoForge.EVENT_BUS.post(new MessagedParsedEvent(player, uuid, username, message, this, parse));*/
     }
 
     public void sendMessage(ServerPlayer player, String username, String message) {

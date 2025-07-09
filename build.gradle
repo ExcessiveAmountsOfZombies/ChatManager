@@ -138,6 +138,11 @@ dependencies {
     compileOnly "curse.maven:ftb-library-forge-404465:6711324"
     compileOnly "curse.maven:ftb-ranks-forge-314905:6431744"
 
+
+    implementation "curse.maven:fancymenu-367706:6722603"
+    implementation "curse.maven:konkrete-410295:5453385"
+    implementation "curse.maven:melody-938643:5453382"
+
     // For more info:
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
