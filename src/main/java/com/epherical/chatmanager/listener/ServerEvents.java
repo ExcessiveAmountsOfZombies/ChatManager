@@ -15,6 +15,7 @@ import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.EventPriority;
@@ -91,19 +92,17 @@ public class ServerEvents {
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     public static void playersChatting(ServerChatEvent event) {
 
-        String rawMsg = "<comp color='#43b581' style='bold'>Welcome, <comp color='#faa61a'>{demo:greet,Steve}</comp><comp color='#ffffff'>! Your coordinates: </comp><comp color='#55acee' style='italic'>{demo:coords}</comp></comp>";
+        String rawMsg = "<comp color='#43b581' style='bold'>Welcome, </comp>" +
+                "<comp color='#faa61a'>{chatmanager:greet,Steve}</comp>" +
+                "<comp color='#ffffff'>! Your coordinates: </comp>" +
+                "<comp color='#55acee' style='italic'>{chatmanager:coords}</comp>";
 
-
-        // Expand placeholders
-        Component processed = PlaceHolderManager.process(
-                rawMsg,
-                PlaceHolderContext.create(event.getPlayer()));
 
 
         ChatMessenger.send(event.getPlayer(), rawMsg);
 
 
-        event.getPlayer().sendSystemMessage(processed);
+        //event.getPlayer().sendSystemMessage(processed);
 
 
 

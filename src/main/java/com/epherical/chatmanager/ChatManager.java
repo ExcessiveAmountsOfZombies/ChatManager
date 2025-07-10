@@ -10,7 +10,6 @@ import com.epherical.chatmanager.placeholders.PlaceHolderManager;
 import com.epherical.chatmanager.placeholders.register.PlayerPlaceholders;
 import com.epherical.chatmanager.util.ChatTypeVirtualPackResources;
 import com.mojang.logging.LogUtils;
-import net.luckperms.api.event.LuckPermsEvent;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -78,7 +77,8 @@ public class ChatManager {
 
         new PlayerPlaceholders();
 
-        //PlaceHolderManager.register(DISPLAY_PLACEHOLDER, (player) -> ChatConfig.displayNameFormat);
+        PlaceHolderManager.registerComponent(DISPLAY_PLACEHOLDER, (player, params) ->
+                PlaceHolderManager.process(ChatConfig.displayNameFormat, player));
         PlaceHolderManager.registerString(PLAYER_PLACEHOLDER, (player, params) -> player.getPlayer().getDisplayName().getString());
         PlaceHolderManager.registerString(MSPT_PLACEHOLDER, (ctx, par) -> {
             if (ctx.getServer() != null) {
