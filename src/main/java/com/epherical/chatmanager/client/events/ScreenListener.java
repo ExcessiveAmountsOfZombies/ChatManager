@@ -1,6 +1,5 @@
 package com.epherical.chatmanager.client.events;
 
-import com.epherical.chatmanager.ChatManager;
 import com.epherical.chatmanager.client.ChannelEntry;
 import com.epherical.chatmanager.client.widgets.ChannelButtonWidget;
 import com.epherical.chatmanager.mixin.client.ChatScreenAccessorMixin;
@@ -8,17 +7,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.ChatScreen;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceKey;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ScreenListener {
 
@@ -56,8 +50,10 @@ public class ScreenListener {
                 new ChannelEntry(ALL_CHANNEL, null, ChatListener.chatComponent));
         allChannelButton.onClick = () -> {
             currentChannel = null;
+            allChannelButton.getEntry().setSelected(true);
             ChatListener.manager.setCurrentChannel(null);
             ChatListener.manager.resetUnread();
+
         };
         currentX += width + buttonSpacing;
 
@@ -70,11 +66,14 @@ public class ScreenListener {
             final int channelIndex = i;
             widget.onClick = () -> {
                 ChannelEntry c = allChannels.remove(channelIndex);
+                allChannels.get(0).setSelected(false);
+                allChannelButton.getEntry().setSelected(false);
                 allChannels.add(0, c);
                 showDropdown = false;
                 currentChannel = c; // Set current channel when clicked
                 ChatListener.manager.setCurrentChannel(c.key());
                 rebuildBar(mc);
+                c.setSelected(true);
                 c.resetUnread();
 
                 // Send join command for channel when button is clicked
@@ -116,9 +115,12 @@ public class ScreenListener {
                 final int channelIndex = i;
                 widget.onClick = () -> {
                     ChannelEntry c = allChannels.remove(channelIndex);
+                    allChannels.get(0).setSelected(false);
+                    allChannelButton.getEntry().setSelected(false);
                     allChannels.add(0, c);
                     showDropdown = false;
                     currentChannel = c;
+                    c.setSelected(true);
                     ChatListener.manager.setCurrentChannel(c.key());
                     rebuildBar(mc);
                     c.resetUnread();
@@ -251,7 +253,6 @@ public class ScreenListener {
             rebuildBar(mc);
         }
     }
-
 
 
 }

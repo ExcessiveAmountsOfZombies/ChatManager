@@ -66,7 +66,10 @@ public class ClientChannelManager {
     }
 
     public void resetUnread() {
-        channelChatComponents.values().forEach(ChannelEntry::resetUnread);
+        for (ChannelEntry entry : channelChatComponents.values()) {
+            entry.setSelected(false);
+            entry.resetUnread();
+        }
     }
 
 

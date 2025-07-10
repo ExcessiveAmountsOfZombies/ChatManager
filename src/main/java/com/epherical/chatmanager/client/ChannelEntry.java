@@ -12,12 +12,22 @@ public final class ChannelEntry {
     private final ResourceKey<ChatType> key;
     private int unread;
 
+    private boolean selected;
+
     public ChannelEntry(Component label, ResourceKey<ChatType> key, ChatComponent chatComponent) {
         this.label = label;
         this.key = key;
         this.chatComponent = chatComponent;
     }
 
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
 
     public ChatComponent getChatComponent() {
         return chatComponent;
