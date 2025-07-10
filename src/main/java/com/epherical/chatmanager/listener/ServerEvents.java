@@ -92,14 +92,11 @@ public class ServerEvents {
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     public static void playersChatting(ServerChatEvent event) {
 
-        String rawMsg = "<comp color='#43b581' style='bold'>Welcome, </comp>" +
+        /*String rawMsg = "<comp color='#43b581' style='bold'>Welcome, </comp>" +
                 "<comp color='#faa61a'>{chatmanager:greet,Steve}</comp>" +
                 "<comp color='#ffffff'>! Your coordinates: </comp>" +
-                "<comp color='#55acee' style='italic'>{chatmanager:coords}</comp>";
-
-
-
-        ChatMessenger.send(event.getPlayer(), rawMsg);
+                "<comp color='#55acee' style='italic'>{chatmanager:coords}</comp>";*/
+        //ChatMessenger.send(event.getPlayer(), rawMsg);
 
 
         //event.getPlayer().sendSystemMessage(processed);

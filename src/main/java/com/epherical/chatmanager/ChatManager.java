@@ -2,6 +2,7 @@ package com.epherical.chatmanager;
 
 import com.epherical.chatmanager.chat.ChannelManager;
 import com.epherical.chatmanager.commands.chat.DynamicChannelCommand;
+import com.epherical.chatmanager.commands.chat.PlaceHolderTest;
 import com.epherical.chatmanager.config.ChatConfig;
 import com.epherical.chatmanager.listener.NameFormatListener;
 import com.epherical.chatmanager.listener.ServerEvents;
@@ -204,6 +205,7 @@ public class ChatManager {
     @SubscribeEvent
     public void onCommands(RegisterCommandsEvent event) {
         new DynamicChannelCommand(channelManager).register(event.getDispatcher());
+        //PlaceHolderTest.registerTestCommand(event);
     }
 
     private static final String PACK_ID = ChatManager.MODID + "_chat_types";
