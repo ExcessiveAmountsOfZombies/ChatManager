@@ -17,17 +17,17 @@ public final class LuckPermsPlaceholders {
     }
 
     private void registerDefaults() {
-        PlaceHolderManager.register(
+        PlaceHolderManager.registerString(
                 ResourceLocation.fromNamespaceAndPath("luckperms", "prefix"),
                 this::getPrefix
         );
-        PlaceHolderManager.register(
+        PlaceHolderManager.registerString(
                 ResourceLocation.fromNamespaceAndPath("luckperms", "suffix"),
                 this::getSuffix
         );
     }
 
-    private String getPrefix(PlaceHolderContext player) {
+    private String getPrefix(PlaceHolderContext player, String... params) {
         if (player == null) return "";
         User user = luckPerms.getUserManager().getUser(player.getPlayer().getUUID());
         if (user == null) return "";
@@ -35,7 +35,7 @@ public final class LuckPermsPlaceholders {
         return meta.getPrefix() == null ? "" : meta.getPrefix();
     }
 
-    private String getSuffix(PlaceHolderContext player) {
+    private String getSuffix(PlaceHolderContext player, String... params) {
         if (player == null) return "";
         User user = luckPerms.getUserManager().getUser(player.getPlayer().getUUID());
         if (user == null) return "";

@@ -7,11 +7,14 @@ import com.epherical.chatmanager.compat.placeholders.LuckPermsPlaceholders;
 import com.epherical.chatmanager.config.ChatConfig;
 import com.epherical.chatmanager.event.BoundChatTypeEvent;
 import com.epherical.chatmanager.permissions.ChannelPermissions;
+import com.epherical.chatmanager.placeholders.PlaceHolderManager;
 import com.epherical.chatmanager.util.ChatMessenger;
+import com.epherical.chatmanager.util.PlaceHolderContext;
 import com.mojang.logging.LogUtils;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.minecraft.network.chat.ChatType;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.EventPriority;
@@ -87,6 +90,21 @@ public class ServerEvents {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     public static void playersChatting(ServerChatEvent event) {
+
+        String rawMsg = "<comp color='#43b581' style='bold'>Welcome, <comp color='#faa61a'>{demo:greet,Steve}</comp><comp color='#ffffff'>! Your coordinates: </comp><comp color='#55acee' style='italic'>{demo:coords}</comp></comp>";
+
+
+        // Expand placeholders
+        Component processed = PlaceHolderManager.process(
+                rawMsg,
+                PlaceHolderContext.create(event.getPlayer()));
+
+
+        ChatMessenger.send(event.getPlayer(), rawMsg);
+
+
+        event.getPlayer().sendSystemMessage(processed);
+
 
 
         ServerPlayer player = event.getPlayer();

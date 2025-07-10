@@ -1,6 +1,9 @@
 package com.epherical.chatmanager.placeholders;
 
 import com.epherical.chatmanager.util.PlaceHolderContext;
+import com.epherical.chatmanager.util.ComponentParser;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.*;
@@ -8,105 +11,122 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Registers and expands placeholders of the form
- *   {namespace:path[,param1,param2,...]}
- * before text is passed to the ComponentParser.
+ *
+ * A placeholder may be registered either as a plain-text supplier or as a
+ * component supplier.  Only one internal registry is used.
  */
 public final class PlaceHolderManager {
 
-    /* ----------  Supplier types ---------- */
+    /* --------------------------------------------------------------------- */
+    /* Public supplier types                                                  */
+    /* --------------------------------------------------------------------- */
 
-    /** New supplier that can receive arbitrary parameters. */
+    /** Produces a component directly. */
     @FunctionalInterface
-    public interface ParamSupplier {
-        String apply(PlaceHolderContext context, String... params);
+    public interface ComponentSupplier {
+        MutableComponent apply(PlaceHolderContext ctx, String... params);
     }
 
-    /**
-     * Legacy supplier that ignores parameters.  All existing code
-     * continues to work through the bridging overload of {@code register}.
-     */
+    /** Produces a String; we will wrap it in Component.literal for you. */
     @FunctionalInterface
-    public interface SimpleSupplier {
-        String apply(PlaceHolderContext context);
+    public interface StringSupplier {
+        String apply(PlaceHolderContext ctx, String... params);
     }
 
-    /* ----------  Registry & pattern ---------- */
+    /* --------------------------------------------------------------------- */
+    /* Private wrapper used in the single registry                           */
+    /* --------------------------------------------------------------------- */
 
-    private static final Map<ResourceLocation, ParamSupplier> REGISTRY = new HashMap<>();
+    private sealed interface Replacement
+            permits Replacement.Text, Replacement.Comp {
 
-    /**
-     * Captures everything between the braces.  We will split the result
-     * on commas so we can support an arbitrary number of parameters.
+        MutableComponent resolve(PlaceHolderContext ctx, String[] params);
+
+        /* ---------- implementations ---------- */
+
+        record Text(StringSupplier supplier) implements Replacement {
+            @Override
+            public MutableComponent resolve(PlaceHolderContext ctx, String[] params) {
+                return Component.literal(supplier.apply(ctx, params));
+            }
+        }
+
+        record Comp(ComponentSupplier supplier) implements Replacement {
+            @Override
+            public MutableComponent resolve(PlaceHolderContext ctx, String[] params) {
+                return supplier.apply(ctx, params);
+            }
+        }
+    }
+
+    /* --------------------------------------------------------------------- */
+    /* Registry & pattern                                                     */
+    /* --------------------------------------------------------------------- */
+
+    private static final Map<ResourceLocation, Replacement> REGISTRY = new HashMap<>();
+    /*
+     *  {my_mod:placeholder,param1,param2,...}
      *
-     * Examples it matches:
-     *   {chatmanager:player}
-     *   {chatmanager:player,x,y,z}
+     *  group(1) ->  my_mod:placeholder
+     *  group(2) ->  param1,param2,...   (may be null / empty if no params)
      */
-    private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("\\{([^{}]+)}");
+    private static final Pattern PLACEHOLDER_PATTERN =
+            Pattern.compile("\\{([a-z0-9_.:-]+)(?:,([^{}]*))?}", Pattern.CASE_INSENSITIVE);
 
     private PlaceHolderManager() {}
 
-    /* ----------  Registration helpers ---------- */
+    /* ----------------------------------------------------------------- */
+    /* Public registration helpers                                       */
+    /* ----------------------------------------------------------------- */
 
-    /** Register a parameter-aware supplier. */
-    public static void register(ResourceLocation id, ParamSupplier supplier) {
-        Objects.requireNonNull(id);
-        Objects.requireNonNull(supplier);
-        if (REGISTRY.putIfAbsent(id, supplier) != null) {
-            throw new IllegalStateException("Placeholder already registered: " + id);
-        }
+    /** Register a placeholder that returns a **component**. */
+    public static void registerComponent(ResourceLocation id, ComponentSupplier supplier) {
+        REGISTRY.put(id, new Replacement.Comp(supplier));
     }
 
-    /** Bridge: register an old-style supplier that ignores parameters. */
-    public static void register(ResourceLocation id, SimpleSupplier supplier) {
-        register(id, (ctx, params) -> supplier.apply(ctx));
+    /** Register a placeholder that returns **plain text**. */
+    public static void registerString(ResourceLocation id, StringSupplier supplier) {
+        REGISTRY.put(id, new Replacement.Text(supplier));
     }
 
-    /* ----------  Expansion ---------- */
+    /* --------------------------------------------------------------------- */
+    /* Expansion                                                              */
+    /* --------------------------------------------------------------------- */
 
-    public static String process(String text, PlaceHolderContext context) {
-        final int RECURSION_LIMIT = 5;
-        String current = text;
+    public static MutableComponent process(String raw, PlaceHolderContext ctx) {
+        MutableComponent out = Component.empty();
+        Matcher matcher      = PLACEHOLDER_PATTERN.matcher(raw);
 
-        for (int i = 0; i < RECURSION_LIMIT; i++) {
-            Matcher matcher = PLACEHOLDER_PATTERN.matcher(current);
-            StringBuffer sb = new StringBuffer();
-            boolean anyFound = false;
-
-            while (matcher.find()) {
-                anyFound = true;
-
-                String insideBraces = matcher.group(1).trim();
-                String[] tokens = insideBraces.split("\\s*,\\s*");   // split on ',' and trim
-                if (tokens.length == 0) {
-                    matcher.appendReplacement(sb, Matcher.quoteReplacement(matcher.group(0)));
-                    continue;
-                }
-
-                ResourceLocation id = ResourceLocation.tryParse(tokens[0]);
-                String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
-
-                String replacement = matcher.group(0); // default: leave unchanged
-                if (id != null) {
-                    ParamSupplier supplier = REGISTRY.get(id);
-                    if (supplier != null) {
-                        String supplied = supplier.apply(context, params);
-                        if (supplied != null) {
-                            replacement = supplied;
-                        }
-                    }
-                }
-                matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement));
+        int lastEnd = 0;
+        while (matcher.find()) {
+            // prefix between previous and current token
+            if (matcher.start() > lastEnd) {
+                out.append(ComponentParser.parse(raw.substring(lastEnd, matcher.start())));
             }
-            matcher.appendTail(sb);
 
-            // stop if we neither found nor changed anything
-            if (!anyFound || sb.toString().equals(current)) {
-                break;
+            /* -------- resolve the found placeholder --------------------- */
+
+            ResourceLocation id = ResourceLocation.parse(matcher.group(1));
+            String   rawParamList = matcher.group(2);         // may be null
+            String[] params       = (rawParamList == null || rawParamList.isEmpty())
+                                    ? new String[0]
+                                    : rawParamList.split(",", -1);
+
+            Replacement repl = REGISTRY.get(id);
+            if (repl != null) {
+                out.append(repl.resolve(ctx, params));
+            } else {                               // unknown → keep visible
+                out.append(Component.literal(matcher.group()));
             }
-            current = sb.toString();
+
+            lastEnd = matcher.end();
         }
-        return current;
+
+        // trailing suffix
+        if (lastEnd < raw.length()) {
+            out.append(ComponentParser.parse(raw.substring(lastEnd)));
+        }
+
+        return out;
     }
 }

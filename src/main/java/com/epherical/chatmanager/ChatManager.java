@@ -11,6 +11,7 @@ import com.epherical.chatmanager.placeholders.register.PlayerPlaceholders;
 import com.epherical.chatmanager.util.ChatTypeVirtualPackResources;
 import com.mojang.logging.LogUtils;
 import net.luckperms.api.event.LuckPermsEvent;
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackLocationInfo;
@@ -77,9 +78,9 @@ public class ChatManager {
 
         new PlayerPlaceholders();
 
-        PlaceHolderManager.register(DISPLAY_PLACEHOLDER, player -> ChatConfig.displayNameFormat);
-        PlaceHolderManager.register(PLAYER_PLACEHOLDER, player -> player.getPlayer().getDisplayName().getString());
-        PlaceHolderManager.register(MSPT_PLACEHOLDER, ctx -> {
+        //PlaceHolderManager.register(DISPLAY_PLACEHOLDER, (player) -> ChatConfig.displayNameFormat);
+        PlaceHolderManager.registerString(PLAYER_PLACEHOLDER, (player, params) -> player.getPlayer().getDisplayName().getString());
+        PlaceHolderManager.registerString(MSPT_PLACEHOLDER, (ctx, par) -> {
             if (ctx.getServer() != null) {
                 double tps = ctx.getServer().tickRateManager().millisecondsPerTick();
                 // If you have an array of TPS values, take the average or a specific value (e.g., last 1 minute)
@@ -88,7 +89,7 @@ public class ChatManager {
             }
             return "?";
         });
-        PlaceHolderManager.register(LEVEL_PLACEHOLDER, ctx -> {
+        PlaceHolderManager.registerString(LEVEL_PLACEHOLDER, (ctx, par) -> {
             if (ctx.getLevel() != null) {
                 return ctx.getLevel().dimension().location().getPath();
             }
@@ -97,53 +98,71 @@ public class ChatManager {
             }
             return "unknown";
         });
-        PlaceHolderManager.register(MOTD_PLACEHOLDER, ctx -> {
+        PlaceHolderManager.registerString(MOTD_PLACEHOLDER, (ctx, par) -> {
             if (ctx.getServer() != null) {
                 return ctx.getServer().getMotd();
             }
             return "Minecraft Server";
         });
-        PlaceHolderManager.register(PLAYER_COUNT, ctx -> {
+        PlaceHolderManager.registerString(PLAYER_COUNT, (ctx, par) -> {
             if (ctx.getServer() != null && ctx.getServer().getPlayerList() != null) {
                 return String.valueOf(ctx.getServer().getPlayerList().getPlayerCount());
             }
             return "?";
         });
 
-        PlaceHolderManager.register(PLAYER_PING, ctx -> {
+        PlaceHolderManager.registerString(PLAYER_PING, (ctx, par) -> {
             if (ctx.getPlayer() != null) {
                 return String.valueOf(ctx.getPlayer().connection.latency());
             }
             return "?";
         });
 
-        PlaceHolderManager.register(PLAYER_X, ctx -> {
+        PlaceHolderManager.registerString(PLAYER_X, (ctx, par) -> {
             if (ctx.getPlayer() != null) {
                 return String.format("%.2f", ctx.getPlayer().getX());
             }
             return "?";
         });
 
-        PlaceHolderManager.register(PLAYER_Y, ctx -> {
+        PlaceHolderManager.registerString(PLAYER_Y, (ctx, par) -> {
             if (ctx.getPlayer() != null) {
                 return String.format("%.2f", ctx.getPlayer().getY());
             }
             return "?";
         });
 
-        PlaceHolderManager.register(PLAYER_Z, ctx -> {
+        PlaceHolderManager.registerString(PLAYER_Z, (ctx, par) -> {
             if (ctx.getPlayer() != null) {
                 return String.format("%.2f", ctx.getPlayer().getZ());
             }
             return "?";
         });
 
-        PlaceHolderManager.register(PLAYER_XYZ, ctx -> {
+        PlaceHolderManager.registerString(PLAYER_XYZ, (ctx, par) -> {
             if (ctx.getPlayer() != null) {
                 return String.format("%.2f, %.2f, %.2f", ctx.getPlayer().getX(), ctx.getPlayer().getY(), ctx.getPlayer().getZ());
             }
             return "?";
         });
+
+        PlaceHolderManager.registerString(
+                ResourceLocation.fromNamespaceAndPath(MODID, "greet"),
+                (ctx, params) -> {
+                    String name = params.length > 0 ? params[0] : "there";
+                    return "Hello, " + name + "!";
+                });
+
+        // {demo:coords}        ->  coloured component replacement
+        PlaceHolderManager.registerComponent(
+                ResourceLocation.fromNamespaceAndPath(MODID, "coords"),
+                (ctx, params) -> {
+                    var pos = ctx.getPlayer().getOnPos();
+                    return Component.literal(
+                                    "%d, %d, %d".formatted(pos.getX(), pos.getY(), pos.getZ()))
+                            .withStyle(ChatFormatting.GOLD);
+                });
+
 
 
         /*PlaceHolderManager.register(PLAYER_MAX_HEALTH, ctx -> {
@@ -160,7 +179,7 @@ public class ChatManager {
             return "?";
         });*/
 
-        PlaceHolderManager.register(PLAYER_HUNGER, ctx -> {
+        PlaceHolderManager.registerString(PLAYER_HUNGER, (ctx, par) -> {
             if (ctx.getPlayer() != null) {
                 return String.valueOf(ctx.getPlayer().getFoodData().getFoodLevel());
             }

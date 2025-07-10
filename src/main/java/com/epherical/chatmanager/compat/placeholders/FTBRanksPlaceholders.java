@@ -20,8 +20,8 @@ public class FTBRanksPlaceholders {
 
 
     private void registerDefaults() {
-        PlaceHolderManager.register(id("rank"),
-                context -> getRank(context.getPlayer()));
+        PlaceHolderManager.registerString(id("rank"),
+                (context, par) -> getRank(context.getPlayer()));
     }
 
 
