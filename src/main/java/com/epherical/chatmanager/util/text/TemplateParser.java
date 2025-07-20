@@ -15,8 +15,7 @@ public final class TemplateParser {
 
     private TemplateParser() {}
 
-    private static final Pattern PLACEHOLDER =
-            Pattern.compile("\\{([a-z0-9_.:-]+)(?:,([^{}]*))?}", Pattern.CASE_INSENSITIVE);
+    private static final Pattern PLACEHOLDER = Pattern.compile("\\{([a-z0-9_.:-]+)(?:,([^{}]*))?}", Pattern.CASE_INSENSITIVE);
 
     public static TemplateNode.Container parse(String raw) {
         Objects.requireNonNull(raw);

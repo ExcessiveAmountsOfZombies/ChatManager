@@ -165,20 +165,19 @@ public class ChatManager {
                 });
 
 
-
-        /*PlaceHolderManager.register(PLAYER_MAX_HEALTH, ctx -> {
+        PlaceHolderManager.registerString(PLAYER_MAX_HEALTH, (ctx, par) -> {
             if (ctx.getPlayer() != null) {
                 return String.format("%.0f", ctx.getPlayer().getMaxHealth());
             }
             return "?";
         });
 
-        PlaceHolderManager.register(PLAYER_HEALTH, ctx -> {
+        PlaceHolderManager.registerString(PLAYER_HEALTH, (ctx, par) -> {
             if (ctx.getPlayer() != null) {
                 return String.format("%.0f", ctx.getPlayer().getHealth());
             }
             return "?";
-        });*/
+        });
 
         PlaceHolderManager.registerString(PLAYER_HUNGER, (ctx, par) -> {
             if (ctx.getPlayer() != null) {
@@ -205,7 +204,7 @@ public class ChatManager {
     @SubscribeEvent
     public void onCommands(RegisterCommandsEvent event) {
         new DynamicChannelCommand(channelManager).register(event.getDispatcher());
-        //PlaceHolderTest.registerTestCommand(event);
+        PlaceHolderTest.registerTestCommand(event);
     }
 
     private static final String PACK_ID = ChatManager.MODID + "_chat_types";
