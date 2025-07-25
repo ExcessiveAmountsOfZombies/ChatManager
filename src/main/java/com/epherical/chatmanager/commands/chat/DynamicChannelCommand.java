@@ -1,8 +1,8 @@
 package com.epherical.chatmanager.commands.chat;
 
+import com.epherical.chatmanager.ChatManager;
 import com.epherical.chatmanager.chat.Channel;
 import com.epherical.chatmanager.chat.ChannelManager;
-import com.epherical.chatmanager.config.ChatConfig;
 import com.epherical.chatmanager.permissions.ChannelPermissions;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -23,7 +23,7 @@ public class DynamicChannelCommand {
 
     // Suggest channel names and aliases for tab completion
     private static final SuggestionProvider<CommandSourceStack> CHANNEL_SUGGESTIONS = (ctx, builder) -> {
-        for (Channel chan : ChatConfig.parsedChannels.values()) {
+        for (Channel chan : ChatManager.mod.config.channels.values()) {
             builder.suggest(chan.name());
             for (String alias : chan.aliases()) {
                 builder.suggest(alias);
@@ -35,12 +35,12 @@ public class DynamicChannelCommand {
     // Helper: lookup Channel by name/alias (case insensitive)
     private static Channel getChannelByNameOrAlias(String input) {
         String normalized = input.toLowerCase();
-        Channel match = ChatConfig.parsedChannels.get(normalized);
+        Channel match = ChatManager.mod.config.channels.get(normalized);
         if (match != null) {
             return match;
         }
         // Check aliases
-        for (Channel chan : ChatConfig.parsedChannels.values()) {
+        for (Channel chan : ChatManager.mod.config.channels.values()) {
             for (String alias : chan.aliases()) {
                 if (alias.equalsIgnoreCase(input)) return chan;
             }

@@ -4,18 +4,13 @@ import com.epherical.chatmanager.ChatManager;
 import com.epherical.chatmanager.chat.Channel;
 import com.epherical.chatmanager.compat.placeholders.FTBRanksPlaceholders;
 import com.epherical.chatmanager.compat.placeholders.LuckPermsPlaceholders;
-import com.epherical.chatmanager.config.ChatConfig;
 import com.epherical.chatmanager.event.BoundChatTypeEvent;
 import com.epherical.chatmanager.permissions.ChannelPermissions;
-import com.epherical.chatmanager.placeholders.PlaceHolderManager;
 import com.epherical.chatmanager.util.ChatMessenger;
-import com.epherical.chatmanager.util.PlaceHolderContext;
 import com.mojang.logging.LogUtils;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.minecraft.network.chat.ChatType;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.EventPriority;
@@ -69,7 +64,7 @@ public class ServerEvents {
 
     // Call this method when a player joins (e.g., onPlayerLoggedIn event)
     public static void joinDefaultChannel(ServerPlayer player) {
-        for (Channel channel : ChatConfig.parsedChannels.values()) {
+        for (Channel channel : ChatManager.mod.config.channels.values()) {
             if (canJoinChannel(player, channel)) {
                 // Add player to the channel here, e.g.:
                 ChatManager.mod.getChannelManager().joinChannel(player, channel.name());

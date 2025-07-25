@@ -1,7 +1,7 @@
 package com.epherical.chatmanager.chat;
 
 import com.epherical.chatmanager.ChatManager;
-import com.epherical.chatmanager.config.ChatConfig;
+import com.epherical.chatmanager.config.ChatManagerConfig;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -16,22 +16,24 @@ public class ChannelManager {
      */
 
     private final ChatManager mod;
+    private final ChatManagerConfig config;
 
     public ChannelManager(ChatManager mod) {
         this.mod = mod;
+        this.config = mod.config;
     }
 
     public Channel getChannel(ServerPlayer player) {
         String currentChannel = getCurrentChannel(player);
-        return ChatConfig.parsedChannels.get(currentChannel.toLowerCase());
+        return config.channels.get(currentChannel.toLowerCase());
     }
 
     public Channel getChannelByName(String channelName) {
-        return ChatConfig.parsedChannels.get(channelName.toLowerCase());
+        return config.channels.get(channelName.toLowerCase());
     }
 
     public Collection<Channel> getAllChannels() {
-        return ChatConfig.parsedChannels.values();
+        return config.channels.values();
     }
 
 

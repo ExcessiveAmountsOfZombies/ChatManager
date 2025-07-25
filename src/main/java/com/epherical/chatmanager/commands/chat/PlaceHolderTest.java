@@ -1,7 +1,6 @@
 package com.epherical.chatmanager.commands.chat;
 
 import com.epherical.chatmanager.ChatManager;
-import com.epherical.chatmanager.placeholders.PlaceHolderManager;
 import com.epherical.chatmanager.util.ChatMessenger;
 import com.mojang.brigadier.Command;
 import net.minecraft.commands.Commands;
@@ -19,7 +18,7 @@ public class PlaceHolderTest {
                             ServerPlayer player = ctx.getSource().getPlayerOrException();
 
                             // Example of evaluating several placeholders for all armor slots
-                            String[] slots = { "HEAD", "CHEST", "LEGS", "FEET" };
+                            String[] slots = {"HEAD", "CHEST", "LEGS", "FEET"};
                             StringBuilder message = new StringBuilder("Armor placeholders:\n");
 
                             /*for (String slot : slots) {

@@ -2,7 +2,6 @@ package com.epherical.chatmanager.permissions;
 
 import com.epherical.chatmanager.ChatManager;
 import com.epherical.chatmanager.chat.Channel;
-import com.epherical.chatmanager.config.ChatConfig;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.server.permission.events.PermissionGatherEvent;
@@ -23,7 +22,7 @@ public class ChannelPermissions {
     @SubscribeEvent
     public void onPermissionNodes(PermissionGatherEvent.Nodes event) {
         // For each channel declared in parsedChannels (should be ready at this phase)
-        for (Channel channel : ChatConfig.parsedChannels.values()) {
+        for (Channel channel : ChatManager.mod.config.channels.values()) {
             String perm = channel.permission();
             if (perm != null && !perm.isBlank()) {
                 PermissionNode<Boolean> node = new PermissionNode<Boolean>(

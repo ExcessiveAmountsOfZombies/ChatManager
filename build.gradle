@@ -143,6 +143,9 @@ dependencies {
     implementation "curse.maven:konkrete-410295:5453385"
     implementation "curse.maven:melody-938643:5453382"
 
+
+    implementation ('com.epherical.epherolib:EpheroLib-neoforge:1.2.0-1.21.1')
+
     // For more info:
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html

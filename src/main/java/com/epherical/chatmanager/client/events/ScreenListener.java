@@ -66,7 +66,10 @@ public class ScreenListener {
             final int channelIndex = i;
             widget.onClick = () -> {
                 ChannelEntry c = allChannels.remove(channelIndex);
-                allChannels.get(0).setSelected(false);
+                if (!allChannels.isEmpty()) {
+                    allChannels.get(0).setSelected(false);
+                }
+
                 allChannelButton.getEntry().setSelected(false);
                 allChannels.add(0, c);
                 showDropdown = false;
@@ -115,7 +118,9 @@ public class ScreenListener {
                 final int channelIndex = i;
                 widget.onClick = () -> {
                     ChannelEntry c = allChannels.remove(channelIndex);
-                    allChannels.get(0).setSelected(false);
+                    if (!allChannels.isEmpty()) {
+                        allChannels.get(0).setSelected(false);
+                    }
                     allChannelButton.getEntry().setSelected(false);
                     allChannels.add(0, c);
                     showDropdown = false;

@@ -1,15 +1,17 @@
 package com.epherical.chatmanager;
 
+import com.epherical.chatmanager.chat.Channel;
 import com.epherical.chatmanager.chat.ChannelManager;
 import com.epherical.chatmanager.commands.chat.DynamicChannelCommand;
 import com.epherical.chatmanager.commands.chat.PlaceHolderTest;
-import com.epherical.chatmanager.config.ChatConfig;
+import com.epherical.chatmanager.config.ChatManagerConfig;
 import com.epherical.chatmanager.listener.NameFormatListener;
 import com.epherical.chatmanager.listener.ServerEvents;
 import com.epherical.chatmanager.permissions.ChannelPermissions;
 import com.epherical.chatmanager.placeholders.PlaceHolderManager;
 import com.epherical.chatmanager.placeholders.register.PlayerPlaceholders;
 import com.epherical.chatmanager.util.ChatTypeVirtualPackResources;
+import com.epherical.epherolib.libs.org.spongepowered.configurate.hocon.HoconConfigurationLoader;
 import com.mojang.logging.LogUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -25,7 +27,6 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.AddPackFindersEvent;
@@ -64,8 +65,13 @@ public class ChatManager {
     public static final ResourceLocation WORLD_TIME = ResourceLocation.fromNamespaceAndPath(MODID, "world_time");
     public static final ResourceLocation WORLD_DAY = ResourceLocation.fromNamespaceAndPath(MODID, "world_day");
 
+    public ChatManagerConfig config;
+
 
     public ChatManager(IEventBus modEventBus, ModContainer modContainer) {
+        config = new ChatManagerConfig(HoconConfigurationLoader.builder(), "chatmanager.conf");
+        config.addSerializer(Channel.class, Channel.Serializer.INSTANCE);
+        config.loadConfig(MODID);
         mod = this;
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::onAddPackFinders);
@@ -73,13 +79,13 @@ public class ChatManager {
         NeoForge.EVENT_BUS.register(this);
         NeoForge.EVENT_BUS.register(new ChannelPermissions());
         NeoForge.EVENT_BUS.register(NameFormatListener.class);
-        modContainer.registerConfig(ModConfig.Type.COMMON, ChatConfig.SPEC, "chatmanager");
+        //modContainer.registerConfig(ModConfig.Type.COMMON, ChatConfig.SPEC, "chatmanager");
 
 
         new PlayerPlaceholders();
 
         PlaceHolderManager.registerComponent(DISPLAY_PLACEHOLDER, (player, params) ->
-                PlaceHolderManager.process(ChatConfig.displayNameFormat, player));
+                PlaceHolderManager.process(config.displayNameFormat, player));
         PlaceHolderManager.registerString(PLAYER_PLACEHOLDER, (player, params) -> player.getPlayer().getDisplayName().getString());
         PlaceHolderManager.registerString(MSPT_PLACEHOLDER, (ctx, par) -> {
             if (ctx.getServer() != null) {

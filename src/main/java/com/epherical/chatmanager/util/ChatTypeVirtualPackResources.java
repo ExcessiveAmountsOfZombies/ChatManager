@@ -2,7 +2,6 @@ package com.epherical.chatmanager.util;
 
 import com.epherical.chatmanager.ChatManager;
 import com.epherical.chatmanager.chat.Channel;
-import com.epherical.chatmanager.config.ChatConfig;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mojang.serialization.JsonOps;
@@ -108,7 +107,7 @@ public class ChatTypeVirtualPackResources implements PackResources {
     private void buildResources() {
         dataResources.clear();
 
-        for (Channel ch : ChatConfig.parsedChannels.values()) {
+        for (Channel ch : ChatManager.mod.config.channels.values()) {
             String id = ch.name().toLowerCase().replaceAll(" ", "_");
             ResourceLocation fileLoc = ResourceLocation.fromNamespaceAndPath(
                     NAMESPACE, "chat_type/" + id + ".json"
