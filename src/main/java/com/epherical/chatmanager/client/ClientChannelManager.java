@@ -6,6 +6,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.network.chat.ChatType;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -14,14 +15,17 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class ClientChannelManager {
-    // Map ChatType resource keys to ChatComponent instances
     private final Map<ResourceKey<ChatType>, ChannelEntry> channelChatComponents = new HashMap<>();
 
-    private ResourceKey<ChatType> currentChannel = null; // null or a special value for "All"
+    private ResourceKey<ChatType> currentChannel = null;
 
+    @Nullable
     public ChatComponent getChatComponent(ResourceKey<ChatType> chatTypeKey) {
-        // Lazily create if absent
-        return channelChatComponents.get(chatTypeKey).getChatComponent();
+        ChannelEntry chatComponent = channelChatComponents.get(chatTypeKey);
+        if (chatComponent != null) {
+            return chatComponent.getChatComponent();
+        }
+        return null;
     }
 
     public void addChannel(ResourceKey<ChatType> chatTypeKey) {

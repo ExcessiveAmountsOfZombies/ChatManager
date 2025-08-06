@@ -30,6 +30,9 @@ public class ChatListener {
         PlayerInfo playerInfo = mc.getConnection().getPlayerInfo(event.getSender());
         if (chatComponent.equals(chat)) {
             ChatComponent chatComponent1 = manager.getChatComponent(event.getBoundChatType().chatType().getKey());
+            if (chatComponent1 == null) {
+                return;
+            }
 
             ChatHeadsReflector.handleAddedMessage(event.getMessage(), event.getBoundChatType(), playerInfo);
             chatComponent1.addMessage(event.getMessage(), null, null);
@@ -37,6 +40,11 @@ public class ChatListener {
             event.setCanceled(true);
         } else {
             ChatComponent chatComponent1 = manager.getChatComponent(event.getBoundChatType().chatType().getKey());
+
+            if (chatComponent1 == null) {
+                return;
+            }
+
             chatComponent1.addMessage(event.getMessage(), null, null);
 
             if (manager != null) {
