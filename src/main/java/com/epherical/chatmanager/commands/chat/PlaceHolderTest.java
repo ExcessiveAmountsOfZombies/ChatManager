@@ -12,7 +12,7 @@ public class PlaceHolderTest {
 
 
     public static void registerTestCommand(RegisterCommandsEvent event) {
-        event.getDispatcher().register(
+        /*event.getDispatcher().register(
                 Commands.literal("testarmorplaceholders")
                         .executes(ctx -> {
                             ServerPlayer player = ctx.getSource().getPlayerOrException();
@@ -21,20 +21,20 @@ public class PlaceHolderTest {
                             String[] slots = {"HEAD", "CHEST", "LEGS", "FEET"};
                             StringBuilder message = new StringBuilder("Armor placeholders:\n");
 
-                            /*for (String slot : slots) {
+                            *//*for (String slot : slots) {
                                 ChatMessenger.send(player, ("{player_armor:defense," + slot + "}"));
                                 ChatMessenger.send(player, "{player_armor:material," + slot + "}");
                                 ChatMessenger.send(player, "{player_armor:durability,current," + slot + "}");
                                 ChatMessenger.send(player, "{player_armor:color,red," + slot + "} LOL COLOR");
                                 //message.append("%s - Defense: %s, Material: %s, Durability: %s\n".formatted(slot, def, mat, dura));
-                            }*/
+                            }*//*
                             ChatMessenger.send(player, "{" + ChatManager.PLAYER_HEALTH + "}");
                             ChatMessenger.send(player, "{" + ChatManager.PLAYER_MAX_HEALTH + "}");
 
                             player.sendSystemMessage(Component.literal(message.toString()));
                             return Command.SINGLE_SUCCESS;
                         })
-        );
+        );*/
     }
 
 }
