@@ -124,7 +124,7 @@ public class ChatTypeVirtualPackResources implements PackResources {
      */
     private static String buildChatTypeJson(String name) {
         ChatType chatType = new ChatType(
-                new ChatTypeDecoration("chat.chatmanager.chat", List.of(ChatTypeDecoration.Parameter.CONTENT), Style.EMPTY),
+                ChatTypeDecoration.withSender("chat.chatmanager.chat"),
                 new ChatTypeDecoration("chat.chatmanager.chat", List.of(ChatTypeDecoration.Parameter.CONTENT), Style.EMPTY)
         );
         var result = ChatType.DIRECT_CODEC.encodeStart(JsonOps.INSTANCE, chatType);

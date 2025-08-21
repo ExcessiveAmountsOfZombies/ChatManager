@@ -84,8 +84,7 @@ public class ChatManager {
 
         new PlayerPlaceholders();
 
-        PlaceHolderManager.registerComponent(DISPLAY_PLACEHOLDER, (player, params) ->
-                PlaceHolderManager.process(config.displayNameFormat, player));
+        PlaceHolderManager.registerComponent(DISPLAY_PLACEHOLDER, (player, params) -> PlaceHolderManager.process(config.displayNameFormat, player));
         PlaceHolderManager.registerString(PLAYER_PLACEHOLDER, (player, params) -> player.getPlayer().getDisplayName().getString());
         PlaceHolderManager.registerString(MSPT_PLACEHOLDER, (ctx, par) -> {
             if (ctx.getServer() != null) {

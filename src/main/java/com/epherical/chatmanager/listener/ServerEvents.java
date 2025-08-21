@@ -6,11 +6,14 @@ import com.epherical.chatmanager.compat.placeholders.FTBRanksPlaceholders;
 import com.epherical.chatmanager.compat.placeholders.LuckPermsPlaceholders;
 import com.epherical.chatmanager.event.BoundChatTypeEvent;
 import com.epherical.chatmanager.permissions.ChannelPermissions;
+import com.epherical.chatmanager.placeholders.PlaceHolderManager;
 import com.epherical.chatmanager.util.ChatMessenger;
 import com.mojang.logging.LogUtils;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.ChatType;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.EventPriority;
@@ -126,7 +129,31 @@ public class ServerEvents {
     @SubscribeEvent
     public static void onBoundChatType(BoundChatTypeEvent e) {
         Channel channel = ChatManager.mod.getChannelManager().getChannel(e.getSender());
-        e.setBoundChatType(ChatType.bind(channel.getChatTypeKey(), e.getSender()));
+        MutableComponent parse = ChatMessenger.parse(e.getSender(), (ChatManager.mod.config.displayNameFormat));
+        e.setBoundChatType(ChatType.bind(channel.getChatTypeKey(), e.getSender().level().registryAccess(), parse));
     }
+
+    @SubscribeEvent
+    public static void onPlayerClone(PlayerEvent.Clone event) {
+        if (event.isWasDeath()) {          // only when the player actually died
+            CompoundTag oldTag = event.getOriginal().getPersistentData();
+            CompoundTag newTag = event.getEntity().getPersistentData();
+
+            // Copy current channel
+            final String CUR = "chatmanager.channel.current";
+            if (oldTag.contains(CUR)) {
+                newTag.putString(CUR, oldTag.getString(CUR));
+            }
+
+            // Copy all mute flags
+            final String PREFIX = "chatmanager.channel.mute.";
+            for (String key : oldTag.getAllKeys()) {
+                if (key.startsWith(PREFIX)) {
+                    newTag.putBoolean(key, oldTag.getBoolean(key));
+                }
+            }
+        }
+    }
+
 
 }

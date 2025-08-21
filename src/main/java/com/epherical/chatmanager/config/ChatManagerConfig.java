@@ -16,7 +16,7 @@ import java.util.Map;
 
 public final class ChatManagerConfig extends CommonConfig {
 
-    public String displayNameFormat = "<comp color='#d4af37'>[</comp><comp color='#ffffff'>{chatmanager:player}</comp><comp color='#d4af37'>]</comp>";
+    public String displayNameFormat = "<comp color='#d4af37'>[</comp><comp color='#ffffff'>{chatmanager:player}</comp><comp color='#d4af37'>]</comp>:";
     public Map<String,Channel> channels = new HashMap<>();
 
     public ChatManagerConfig(AbstractConfigurationLoader.Builder<?, ?> loaderBuilder, String configName) {
@@ -49,7 +49,7 @@ public final class ChatManagerConfig extends CommonConfig {
                     .comment("Format for player display names. Supports placeholders such as "
                             + "{chatmanager:player}, {luckperms:prefix}, etc.")
                     .set("<comp color='#d4af37'>[</comp><comp color='#ffffff'>{chatmanager:player}</comp>"
-                            + "<comp color='#d4af37'>]</comp>");
+                            + "<comp color='#d4af37'>]</comp>:");
 
             CommentedConfigurationNode channelsNode = root.node("channels");
 
@@ -59,28 +59,28 @@ public final class ChatManagerConfig extends CommonConfig {
                             List.of("general"),
                             "chatmanager.channel.general",
                             ChannelType.LOCAL,
-                            "{chatmanager:display}: <comp color='#808080'>{message}</comp>"
+                            "<comp color='#808080'>{message}</comp>"
                     ),
                     new Channel(
                             "Markets",
                             List.of("markets", "market"),
                             "chatmanager.channel.markets",
                             ChannelType.LOCAL,
-                            "{chatmanager:display}: <comp color='#1abc9c'>{message}</comp>"
+                            "<comp color='#1abc9c'>{message}</comp>"
                     ),
                     new Channel(
                             "Offtopic",
                             List.of("offtopic", "off"),
                             "chatmanager.channel.offtopic",
                             ChannelType.LOCAL,
-                            "{chatmanager:display}: <comp color='#b490ff'>{message}</comp>"
+                            "<comp color='#b490ff'>{message}</comp>"
                     ),
                     new Channel(
                             "Help",
                             List.of("help"),
                             "chatmanager.channel.help",
                             ChannelType.LOCAL,
-                            "{chatmanager:display}: <comp color='#ffbc40'>{message}</comp>"
+                            "<comp color='#ffbc40'>{message}</comp>"
                     )
             );
 
